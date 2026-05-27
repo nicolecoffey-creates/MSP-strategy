@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSP Growth-Stage Strategy</title>
+<style>
+  :root {
+    --black: #111110;
+    --charcoal-deep: #1a1917;
+    --charcoal: #252320;
+    --charcoal-mid: #2e2c28;
+    --charcoal-light: #3d3a35;
+    --amber-bright: #c8851a;
+    --amber-mid: #d99b30;
+    --amber-light: #fdf0d8;
+    --amber-xlight: #fef8ed;
+    --amber-border: #e8c47a;
+    --white: #ffffff;
+    --off-white: #faf9f7;
+    --text: #1c1a17;
+    --text-muted: #5c5649;
+    --text-faint: #9e9688;
+    --border: #e2ddd4;
+    --border-light: #edeae4;
+    --teal: #b04a1e;
+    --teal-light: #fceee8;
+    --teal-border: #e8a888;
+    --purple: #3d3580;
+    --purple-light: #eeedf8;
+    --purple-border: #b0aadc;
+    --green-light: #e8f5ec;
+    --green: #2a6b3c;
+    --amber-light2: #fef3c7;
+    --amber-warn: #b45309;
+    --red-light: #fceaea;
+    --red: #b02020;
+    --sky: #e8c47a;
+    --blue-bright: var(--amber-bright);
+    --blue-light: var(--amber-light);
+    --blue-xlight: var(--amber-xlight);
+    --nav-w: 224px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px; line-height: 1.65; color: var(--text);
+    background: var(--off-white);
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--black); color: #fff;
+    padding: 18px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; border-bottom: 4px solid var(--amber-bright);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 20px; }
+  .topbar-divider { width: 1px; height: 32px; background: rgba(255,255,255,.15); }
+  .topbar-title { font-size: 15px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .topbar-sub { font-size: 13px; color: var(--amber-border); margin-top: 2px; }
+  .topbar-firm { font-size: 14px; font-weight: 700; color: var(--amber-border); letter-spacing: .04em; }
+  .topbar-firm-sub { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 1px; }
+  .topbar-badge { background: var(--amber-bright); color: #fff; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 5px; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+
+  .layout { display: flex; flex: 1; overflow: hidden; }
+
+  .sidebar {
+    width: 256px; background: var(--charcoal);
+    flex-shrink: 0; display: flex; flex-direction: column;
+    padding: 28px 0; overflow-y: auto;
+  }
+  .nav-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: rgba(255,255,255,.4); padding: 0 22px 10px; }
+  .nav-btn {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 22px; background: transparent; border: none;
+    cursor: pointer; text-align: left; color: rgba(255,255,255,.6);
+    font-family: inherit; font-size: 14px; line-height: 1.4;
+    transition: background .15s, color .15s;
+    border-left: 3px solid transparent; width: 100%;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,.07); color: #fff; }
+  .nav-btn.active { background: rgba(255,255,255,.1); color: #fff; border-left-color: var(--amber-bright); }
+  .nav-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .nav-btn-name { font-weight: 600; display: block; font-size: 14px; }
+  .nav-btn-sub { font-size: 12px; opacity: .7; display: block; margin-top: 2px; }
+  .nav-divider { border: none; border-top: 1px solid rgba(255,255,255,.1); margin: 14px 22px; }
+
+  .main { flex: 1; overflow-y: auto; padding: 36px 48px 56px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Section labels */
+  .sec-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .1em; color: var(--text-faint); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section { margin-bottom: 32px; }
+
+  /* Hero panels */
+  .hero {
+    border-radius: 14px; padding: 32px 40px; margin-bottom: 32px;
+    color: #fff; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;
+  }
+  .hero-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+  .hero-title { font-size: 28px; font-weight: 700; margin-bottom: 10px; line-height: 1.2; }
+  .hero-tag { font-size: 15px; opacity: .85; line-height: 1.65; max-width: 600px; }
+
+  /* Cards */
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px; }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .card-body { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  /* Two col */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+  .stat { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .stat-lbl { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; }
+  .stat-val { font-size: 28px; font-weight: 800; }
+
+  /* Bullet items */
+  .item { display: flex; gap: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.6; }
+  .sub-label { font-size: 11px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
+
+  /* Persona */
+  .persona-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 26px; }
+  .persona-head { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+  .avatar { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0; }
+  .persona-title { font-weight: 700; font-size: 17px; margin-bottom: 4px; }
+  .persona-bio { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .quote { border-left: 4px solid; padding: 12px 18px; font-style: italic; font-size: 15px; color: var(--text-muted); line-height: 1.7; margin-bottom: 20px; background: var(--off-white); }
+
+  /* Comp table */
+  .comp-table { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .comp-row { display: flex; gap: 14px; align-items: flex-start; padding: 16px 20px; background: var(--white); }
+  .comp-row + .comp-row { border-top: 1px solid var(--border-light); }
+  .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 5px; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+  .comp-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .comp-note { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+  /* Channel rows */
+  .ch-list { display: flex; flex-direction: column; gap: 10px; }
+  .ch-row { display: flex; gap: 14px; align-items: flex-start; padding: 14px 18px; background: var(--white); border: 1px solid var(--border); border-radius: 10px; }
+  .ch-badge { min-width: 96px; text-align: center; }
+  .ch-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .ch-note { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+  /* White box */
+  .white-box { border-radius: 10px; padding: 18px 22px; }
+  .white-box-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .white-box-txt { font-size: 14px; line-height: 1.7; }
+
+  /* Sweet spot */
+  .sweet { background: var(--off-white); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  /* Badge colors */
+  .hi { background: var(--red-light); color: var(--red); }
+  .med { background: var(--amber-light); color: var(--amber-bright); }
+  .lo { background: var(--green-light); color: var(--green); }
+  .conf { background: var(--amber-light); color: var(--amber-bright); }
+  .assoc { background: var(--green-light); color: var(--green); }
+  .media { background: var(--charcoal-mid); color: #e8e0d0; }
+  .ref { background: var(--teal-light); color: var(--teal); }
+  .local { background: var(--purple-light); color: var(--purple); }
+
+  /* Journey map */
+  .journey { display: flex; gap: 0; margin-bottom: 32px; }
+  .journey-step {
+    flex: 1; background: var(--white); border: 1px solid var(--border);
+    padding: 22px 24px; position: relative;
+  }
+  .journey-step:first-child { border-radius: 12px 0 0 12px; }
+  .journey-step:last-child { border-radius: 0 12px 12px 0; }
+  .journey-step + .journey-step { border-left: none; }
+  .journey-step::after {
+    content: ''; position: absolute; top: 50%; right: -13px;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    border-left: 13px solid var(--border);
+    z-index: 2;
+  }
+  .journey-step:last-child::after { display: none; }
+  .journey-step::before {
+    content: ''; position: absolute; top: 50%; right: -12px;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    border-left: 13px solid var(--white);
+    z-index: 3;
+  }
+  .journey-step:last-child::before { display: none; }
+  .journey-num { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 7px; }
+  .journey-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .journey-body { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .journey-size { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 5px; margin-bottom: 10px; }
+
+  .footer { margin-top: 48px; padding: 16px 0; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-faint); display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div>
+      <div class="topbar-title">MSP Growth-Stage Strategy</div>
+      <div class="topbar-sub">Niche intelligence for health insurance brokers</div>
+    </div>
+    <div class="topbar-divider"></div>
+    <div>
+      
+      <div class="topbar-firm-sub">San Diego, CA</div>
+    </div>
+  </div>
+  <div class="topbar-badge">Confidential · 2026</div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="nav-section-label">Strategy</div>
+    <button class="nav-btn active" onclick="show('overview',this)">
+      <div class="nav-icon" style="background:rgba(200,133,26,.15)">🗺</div>
+      <div>
+        <span class="nav-btn-name">The Model</span>
+        <span class="nav-btn-sub">Mixed strategy overview</span>
+      </div>
+    </button>
+    <hr class="nav-divider">
+    <div class="nav-section-label">Target Segments</div>
+    <button class="nav-btn" onclick="show('small',this)">
+      <div class="nav-icon" style="background:rgba(176,74,30,.15)">🌱</div>
+      <div>
+        <span class="nav-btn-name">Plant the Seed</span>
+        <span class="nav-btn-sub">5–18 employees</span>
+      </div>
+    </button>
+    <button class="nav-btn" onclick="show('transition',this)">
+      <div class="nav-icon" style="background:rgba(61,53,128,.15)">🔄</div>
+      <div>
+        <span class="nav-btn-name">Ready to Transition</span>
+        <span class="nav-btn-sub">20–35 employees</span>
+      </div>
+    </button>
+    <hr class="nav-divider">
+    <div class="nav-section-label">Scale</div>
+    <button class="nav-btn" onclick="show('geo',this)">
+      <div class="nav-icon" style="background:rgba(61,53,128,.15)">🌐</div>
+      <div>
+        <span class="nav-btn-name">Geographic Strategy</span>
+        <span class="nav-btn-sub">Local → Regional → National</span>
+      </div>
+    </button>
+    <hr class="nav-divider">
+    <div class="nav-section-label">Access</div>
+    <button class="nav-btn" onclick="show('channels',this)">
+      <div class="nav-icon" style="background:rgba(200,133,26,.15)">📍</div>
+      <div>
+        <span class="nav-btn-name">Where to Find Them</span>
+        <span class="nav-btn-sub">National + San Diego</span>
+      </div>
+    </button>
+    <hr class="nav-divider">
+    <div class="nav-section-label">Reference</div>
+    <button class="nav-btn" onclick="show('glossary',this)">
+      <div class="nav-icon" style="background:rgba(200,133,26,.15)">📖</div>
+      <div>
+        <span class="nav-btn-name">MSP Glossary</span>
+        <span class="nav-btn-sub">Speak their language</span>
+      </div>
+    </button>
+  </nav>
+
+  <main class="main">
+
+    <!-- OVERVIEW PANEL -->
+    <div id="overview" class="panel active">
+      <div class="hero" style="background:linear-gradient(135deg, #181512, #2a2117);">
+        <div>
+          <div class="hero-eyebrow" style="color:var(--amber-border)">MSPs & IT Services · Growth-Stage Niche</div>
+          <div class="hero-title">Seed small. Earn the transition.</div>
+          <div class="hero-tag">Most brokers ignore MSPs until they're large enough to be worth quoting. This model does the opposite: build relationships early, right-size the strategy at every stage, and be the broker who was already there when the MSP outgrows the PEO model.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Why this model works in this industry</div>
+        <div class="two-col">
+          <div class="card">
+            <div style="font-size:18px;margin-bottom:10px;">🤝</div>
+            <div class="card-title">MSPs are loyal to vendors who speak their language</div>
+            <div class="card-body">The MSP community is tight, channel-driven, and heavily referral-based. An owner who hears you talk about MRR, per-seat economics, and the difference between a help desk tech and a vCIO will remember you. One who hears generic broker language will not. Loyalty earned early compounds fast in a community this well-networked.</div>
+          </div>
+          <div class="card">
+            <div style="font-size:18px;margin-bottom:10px;">📈</div>
+            <div class="card-title">The PEO exit is a predictable life event, not a cold pitch</div>
+            <div class="card-body">PEOs make sense under 20 employees. Above 25, the per-employee economics start inverting, and by 35–50 employees, most MSP owners are paying for services they no longer need bundled together. The broker who planted the seed owns the conversation when that inflection point arrives, rather than cold-calling in from the outside.</div>
+          </div>
+          <div class="card">
+            <div style="font-size:18px;margin-bottom:10px;">💬</div>
+            <div class="card-title">The referral flywheel is faster here than almost anywhere</div>
+            <div class="card-body">MSP owners talk to each other constantly, in peer groups, in vendor ecosystems, in Slack communities, at ASCII events. A broker who helps one owner make a smart transition gets mentioned by name in those rooms. One good case study inside a peer group can generate more qualified introductions than a year of outbound.</div>
+          </div>
+          <div class="card">
+            <div style="font-size:18px;margin-bottom:10px;">📦</div>
+            <div class="card-title">The PEO referral fee funds the early relationship</div>
+            <div class="card-body">Placing a small MSP into the right PEO isn't charity work. Most PEO relationships generate an ongoing referral commission to the placing broker. The early accounts pay while the book matures, and the transition revenue is additive when growth arrives. The model has positive unit economics at both stages.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">The client journey</div>
+        <div class="journey">
+          <div class="journey-step">
+            <div class="journey-size" style="background:var(--teal-light);color:var(--teal)">5–12 employees</div>
+            <div class="journey-num" style="color:var(--teal)">Stage 1</div>
+            <div class="journey-title">First introduction</div>
+            <div class="journey-body">Meet the owner at a peer group, ASCII event, or through a vendor referral. They're in a PEO or have no benefits infrastructure. Position yourself as the advisor who will right-size this as they grow. No pitch, just education.</div>
+          </div>
+          <div class="journey-step">
+            <div class="journey-size" style="background:var(--amber-light);color:var(--amber-bright)">12–20 employees</div>
+            <div class="journey-num" style="color:var(--amber-bright)">Stage 2</div>
+            <div class="journey-title">PEO placement or audit</div>
+            <div class="journey-body">If they are not yet in a PEO, place them in the right one and earn the ongoing referral relationship. If they are already in one, audit it. Show them what they're paying per employee and flag the inflection point on the horizon.</div>
+          </div>
+          <div class="journey-step">
+            <div class="journey-size" style="background:var(--purple-light);color:var(--purple)">20–35 employees</div>
+            <div class="journey-num" style="color:var(--purple)">Stage 3</div>
+            <div class="journey-title">The transition conversation</div>
+            <div class="journey-body">The PEO cost curve has inverted. Run the actual numbers side by side. Show them what a direct benefits strategy costs per employee versus what they're currently paying. This is the moment the early relationship was built for.</div>
+          </div>
+          <div class="journey-step">
+            <div class="journey-size" style="background:var(--green-light);color:var(--green)">35+ employees</div>
+            <div class="journey-num" style="color:var(--green)">Stage 4</div>
+            <div class="journey-title">Full advisory relationship</div>
+            <div class="journey-body">Traditional group health broker relationship with a consultative layer: plan strategy, renewal analysis, benchmark data, and continued positioning as the expert who has been with them since the early days.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Why now, in San Diego specifically</div>
+        <div class="card" style="border-left:4px solid var(--amber-bright);">
+          <div style="display:flex;gap:16px;align-items:flex-start;">
+            <div style="font-size:22px;flex-shrink:0;">📍</div>
+            <div>
+              <div class="card-title">San Diego has a dense and growing MSP market</div>
+              <div class="card-body" style="margin-bottom:10px;">San Diego's defense, biotech, and professional services base creates a strong MSP demand environment. Many of these MSPs serve regulated verticals (CMMC compliance for defense contractors, HIPAA for biotech) where benefits sophistication also signals professional credibility to clients, not just employees. That's a two-sided value proposition most brokers never identify.</div>
+              <div style="background:var(--amber-xlight);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text-muted);">
+                <strong style="color:var(--charcoal-mid)">ChannelCon 2026 is in San Diego, August 3–5.</strong> This is the flagship conference for the Global Technology Industry Association, the major vendor-neutral MSP membership org. Having this land locally means the highest-value national MSP conference is a 20-minute drive away. That is a rare and time-sensitive access point.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">The honest challenges</div>
+        <div class="two-col">
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px 20px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:12px;">Volume required</div>
+            <div class="card-body">Small MSPs are small accounts. The book needs volume to generate meaningful revenue during the early-stage phase. Systemizing the onboarding process and managing a larger number of relationships simultaneously is a prerequisite for the model to work.</div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:22px 26px;">
+            <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber-bright);margin-bottom:14px;">⚠ Churn and PE Risk: How to Mitigate It</div>
+            <div style="font-size:15px;color:var(--text-muted);line-height:1.7;margin-bottom:20px;">MSP consolidation by private equity is accelerating fast. A client acquired by a PE-backed roll-up may not survive as an independent long enough to reach Stage 4. The mitigation strategy is deliberate vertical targeting: <strong style="color:var(--text)">prioritize MSPs serving industries where PE roll-ups are structurally less common.</strong></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+              <div style="background:var(--green-light);border:1px solid #b6e4c2;border-radius:10px;padding:18px 20px;">
+                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--green);margin-bottom:10px;">Lower PE consolidation risk</div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;">
+                    <span style="color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                    <div><strong>Defense / CMMC compliance MSPs</strong><br><span style="color:var(--text-muted);font-size:13px;">Federal contract compliance requirements make these MSPs difficult to bundle into a roll-up. Sticky, mission-critical contracts. San Diego's defense base makes this a natural local priority.</span></div>
+                  </div>
+                  <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;">
+                    <span style="color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                    <div><strong>Healthcare IT / HIPAA-focused MSPs</strong><br><span style="color:var(--text-muted);font-size:13px;">Complex compliance requirements and liability exposure make consolidation harder. Owners in this vertical tend to want to retain control and stay independent longer.</span></div>
+                  </div>
+                  <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;">
+                    <span style="color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                    <div><strong>Legal / financial services MSPs</strong><br><span style="color:var(--text-muted);font-size:13px;">Client confidentiality requirements, bar association rules, and FINRA/SEC oversight create barriers to PE roll-up. Clients won't follow a consolidated provider.</span></div>
+                  </div>
+                  <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;">
+                    <span style="color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                    <div><strong>Government / public sector IT MSPs</strong><br><span style="color:var(--text-muted);font-size:13px;">Contract vehicles (GSA schedules, SEWP), clearance requirements, and federal procurement rules create strong barriers to acquisition and consolidation.</span></div>
+                  </div>
+                </div>
+              </div>
+              <div style="background:var(--red-light);border:1px solid #f0b8b8;border-radius:10px;padding:18px 20px;">
+                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:10px;">Higher PE consolidation risk</div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;">
+                    <span style="color:var(--red);font-weight:700;flex-shrink:0;">✗</span>
+                    <div><strong>Generalist SMB MSPs</strong><br><span style="color:var(--text-muted);font-size:13px;">No vertical lock-in, commoditized service, easy to bolt into a roll-up platform. The most targeted segment by PE consolidators.</span></div>
+                  </div>
+                  <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;">
+                    <span style="color:var(--red);font-weight:700;flex-shrink:0;">✗</span>
+                    <div><strong>Break-fix / low-MRR shops</strong><br><span style="color:var(--text-muted);font-size:13px;">Easy acquisition targets for roll-ups buying client bases at low multiples. Often sold or absorbed before reaching the 25-employee transition threshold.</span></div>
+                  </div>
+                  <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;">
+                    <span style="color:var(--red);font-weight:700;flex-shrink:0;">✗</span>
+                    <div><strong>MSPs in hot consolidation markets</strong><br><span style="color:var(--text-muted);font-size:13px;">Markets like general cloud services and co-managed IT are PE-active right now. Avoid over-indexing here for Stage 1 relationship building.</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="background:var(--amber-xlight);border:1px solid var(--amber-border);border-radius:8px;padding:14px 18px;font-size:14px;color:var(--text-muted);line-height:1.65;">
+              <strong style="color:var(--amber-bright);">Practical filter:</strong> When qualifying a small MSP for Stage 1, ask two questions early: "What verticals do most of your clients come from?" and "Is staying independent something you've thought about long-term?" Those two answers will tell you more about retention risk than any other signal.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>MSP Growth-Stage Strategy Overview · San Diego</span>
+        <span>Research compiled May 2026</span>
+      </div>
+    </div>
+
+    <!-- SMALL MSP PANEL -->
+    <div id="small" class="panel">
+      <div class="hero" style="background:linear-gradient(135deg, #1e1208, #2e1e0a);">
+        <div>
+          <div class="hero-eyebrow" style="color:#e8c47a">5–18 Employees · Plant the Seed Segment</div>
+          <div class="hero-title">The small MSP: find them early, be the one who was already there</div>
+          <div class="hero-tag">These owners are usually in a PEO they signed up for at 8 employees and haven't thought about since. The value here isn't a transaction, it's positioning for the conversation that comes later.</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">strategy type</div>
+          <div style="font-size:18px;font-weight:800;color:#e8c47a">Relationship<br>first</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Market sizing</div>
+        <div class="stats-grid">
+          <div class="stat"><div class="stat-lbl">Total MSPs in the US</div><div class="stat-val" style="color:var(--teal)">40,000+</div></div>
+          <div class="stat"><div class="stat-lbl">Est. operating under 20 employees</div><div class="stat-val" style="color:var(--teal)">~60%</div></div>
+          <div class="stat"><div class="stat-lbl">MSPs in PEO relationships at this size</div><div class="stat-val" style="color:var(--teal)">High</div></div>
+          <div class="stat"><div class="stat-lbl">PEO sweet spot per research</div><div class="stat-val" style="color:var(--teal)">5–20</div></div>
+        </div>
+        <div class="sweet"><strong>What you're doing here:</strong> Not quoting benefits. Positioning yourself as the advisor who understands MSP economics, can audit their current PEO arrangement, and will be their person when the time comes. The deliverable at this stage is trust and awareness, not commission.</div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Buyer persona</div>
+        <div class="persona-card">
+          <div class="persona-head">
+            <div class="avatar" style="background:var(--teal-light);color:var(--teal)">CEO</div>
+            <div>
+              <div class="persona-title">MSP Owner / Founder (early stage)</div>
+              <div class="persona-bio">Ex-sysadmin or helpdesk tech who started doing break-fix work and accidentally built a managed services practice. Has 6–15 employees, a handful of anchor clients, is on a PSA like ConnectWise or HaloPSA, and is probably paying Insperity or TriNet (TRUE Network Partner) too much money without knowing it.</div>
+            </div>
+          </div>
+          <div class="quote" style="border-left-color:var(--teal)">"HR is the last thing I want to deal with. The PEO handles it. I don't love what it costs but at least I don't have to think about it."</div>
+          <div class="two-col">
+            <div>
+              <div class="sub-label">What they need from you</div>
+              <div class="item"><span style="color:var(--teal);flex-shrink:0">•</span><span>Education, not a pitch. Show them you understand the MSP business model.</span></div>
+              <div class="item"><span style="color:var(--teal);flex-shrink:0">•</span><span>A simple PEO cost-per-employee analysis they've never seen before</span></div>
+              <div class="item"><span style="color:var(--teal);flex-shrink:0">•</span><span>Confirmation that what they have now is fine for their stage</span></div>
+              <div class="item"><span style="color:var(--teal);flex-shrink:0">•</span><span>Awareness that there's a better path waiting for them at the right size</span></div>
+            </div>
+            <div>
+              <div class="sub-label">What earns their trust</div>
+              <div class="item"><span style="color:var(--teal);flex-shrink:0">→</span><span>Speaking in MRR, per-seat cost, and utilization, not "benefits strategy"</span></div>
+              <div class="item"><span style="color:var(--teal);flex-shrink:0">→</span><span>Having a peer group presence or vendor endorsement</span></div>
+              <div class="item"><span style="color:var(--teal);flex-shrink:0">→</span><span>Not trying to close them on something they don't need yet</span></div>
+              <div class="item"><span style="color:var(--teal);flex-shrink:0">→</span><span>Giving them something useful (the PEO audit) with no immediate ask</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">What the PEO audit conversation looks like</div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">How to open the door with a small MSP today</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--off-white);border-radius:8px;border-left:3px solid var(--teal);">
+              <div style="font-size:12px;font-weight:700;color:var(--teal);flex-shrink:0;width:60px;margin-top:1px;">Ask</div>
+              <div style="font-size:13px;color:var(--text-muted);">"Do you know what your all-in cost per employee is through your PEO, including admin fees, not just the benefits line?"</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--off-white);border-radius:8px;border-left:3px solid var(--teal);">
+              <div style="font-size:12px;font-weight:700;color:var(--teal);flex-shrink:0;width:60px;margin-top:1px;">Offer</div>
+              <div style="font-size:13px;color:var(--text-muted);">"I'll run an audit at no cost. It'll take 20 minutes of your time. If the numbers look fine, you'll know you're in good shape. If they don't, you'll know what to do about it when the time comes."</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--off-white);border-radius:8px;border-left:3px solid var(--teal);">
+              <div style="font-size:12px;font-weight:700;color:var(--teal);flex-shrink:0;width:60px;margin-top:1px;">Frame</div>
+              <div style="font-size:13px;color:var(--text-muted);">Be explicit: "I'm not here to move you off your PEO today. At your size, it may still be the right call. But I specialize in IT firms specifically, and I want to make sure you have the right setup for where you're headed."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Revenue model at this stage</div>
+        <div style="background:linear-gradient(135deg,#181512,#2a2010);border-radius:12px;padding:18px 22px;margin-bottom:16px;display:flex;gap:16px;align-items:center;">
+          <div style="font-size:26px;flex-shrink:0;">🤝</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber-border);margin-bottom:5px;">TRUE Advisor Network Partners</div>
+            <div style="font-size:14px;color:rgba(255,255,255,.85);line-height:1.65;"><strong style="color:#fff;">TriNet</strong> and <strong style="color:#fff;">Empower Consulting Partners</strong> are both partners within the TRUE Advisor Network. These are warm relationships, not cold vendor outreach. Leverage these connections when placing or evaluating PEO arrangements for MSP clients.</div>
+          </div>
+        </div>
+        <div class="two-col" style="margin-bottom:14px;">
+          <div class="card" style="border-top:3px solid var(--amber-bright);">
+            <div class="card-title">PEO referral commissions</div>
+            <div class="card-body">Most PEOs (Insperity, ADP TotalSource, <strong>TriNet</strong>, Justworks) pay ongoing broker commissions on referred accounts. <strong>TriNet is a TRUE Network Partner.</strong> Use that relationship as the starting point when placing a small MSP. Revenue is generated for as long as the client stays enrolled. Not large per account, but it compounds across a growing book.</div>
+          </div>
+          <div class="card" style="border-top:3px solid var(--amber-bright);">
+            <div class="card-title">Empower Consulting Partners</div>
+            <div class="card-body"><strong>Empower Consulting Partners is also a TRUE Network Partner</strong> and a natural ally in the PEO strategy. As an HR and benefits consulting firm, Empower can co-serve MSP clients on the HR infrastructure side of a PEO transition while the broker owns the benefits placement, a referral partnership that serves the client more completely than either firm could alone.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">The PEO audit as a paid engagement</div>
+          <div class="card-body">As the practice matures and reputation builds, the audit itself can become a small flat-fee engagement. MSP owners are accustomed to paying for expertise by the hour or by the project, which is exactly how they bill their own clients. Frame it in their language.</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Plant the Seed Segment · 5–18 Employees</span>
+        <span>San Diego · May 2026</span>
+      </div>
+    </div>
+
+    <!-- TRANSITION PANEL -->
+    <div id="transition" class="panel">
+      <div class="hero" style="background:linear-gradient(135deg, #171220, #241838);">
+        <div>
+          <div class="hero-eyebrow" style="color:#b0aadc">20–35 Employees · Ready to Transition Segment</div>
+          <div class="hero-title">The inflection point: when the PEO math stops working</div>
+          <div class="hero-tag">This is the segment where the real broker value lives. The PEO that made sense at 10 employees is now a significant annual overpayment, and the owner usually knows it but hasn't had anyone put numbers in front of them.</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">strategy type</div>
+          <div style="font-size:18px;font-weight:800;color:#b0aadc">Transition<br>broker</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">The economics of the transition</div>
+        <div class="stats-grid">
+          <div class="stat"><div class="stat-lbl">Typical PEO fee per employee per month</div><div class="stat-val" style="color:var(--purple)">$150+</div></div>
+          <div class="stat"><div class="stat-lbl">Annual PEO admin cost, 30-employee firm</div><div class="stat-val" style="color:var(--purple)">$54K+</div></div>
+          <div class="stat"><div class="stat-lbl">Documented savings on one 35-person exit</div><div class="stat-val" style="color:var(--purple)">$100K</div></div>
+          <div class="stat"><div class="stat-lbl">Notice period for most PEO exits</div><div class="stat-val" style="color:var(--purple)">30–60d</div></div>
+        </div>
+        <div class="sweet"><strong>The inflection point:</strong> PEO pricing is typically structured as a percentage of payroll or a flat per-employee-per-month fee. At 10 employees the bundle is worth it. At 30, the MSP is paying for HR compliance infrastructure they could replicate with a standalone HRIS at a fraction of the cost, while getting a far more customizable, competitive benefits package through direct broker placement.</div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Buyer persona</div>
+        <div class="persona-card">
+          <div class="persona-head">
+            <div class="avatar" style="background:var(--purple-light);color:var(--purple)">CEO</div>
+            <div>
+              <div class="persona-title">MSP Owner / CEO (growth stage)</div>
+              <div class="persona-bio">Has been running the MSP for 5–8 years. 20–35 employees, steady MRR, a small leadership team. Probably runs EOS or something similar. Starting to recruit at the vCIO and senior engineer level, where benefit quality is actually discussed in offer conversations. Knows the PEO is expensive but hasn't had a clear alternative presented.</div>
+            </div>
+          </div>
+          <div class="quote" style="border-left-color:var(--purple-border)">"We're paying Insperity $180 per person per month and I genuinely don't know what I'm getting for that anymore. Someone told me we should probably look at moving off it but I don't know who to call."</div>
+          <div class="two-col">
+            <div>
+              <div class="sub-label">Pain points</div>
+              <div class="item"><span style="color:var(--purple);flex-shrink:0">•</span><span>PEO cost is opaque and increasing with every hire</span></div>
+              <div class="item"><span style="color:var(--purple);flex-shrink:0">•</span><span>Plan design is rigid, locked to what the PEO offers</span></div>
+              <div class="item"><span style="color:var(--purple);flex-shrink:0">•</span><span>Can't customize benefits to compete for senior technical hires</span></div>
+              <div class="item"><span style="color:var(--purple);flex-shrink:0">•</span><span>No one explaining what the transition would actually involve</span></div>
+              <div class="item"><span style="color:var(--purple);flex-shrink:0">•</span><span>Worried the exit will be operationally painful</span></div>
+            </div>
+            <div>
+              <div class="sub-label">Decision triggers</div>
+              <div class="item"><span style="color:var(--purple);flex-shrink:0">→</span><span>Losing a senior engineer hire to a competitor citing better benefits</span></div>
+              <div class="item"><span style="color:var(--purple);flex-shrink:0">→</span><span>CFO or ops manager flags the PEO line item in an annual review</span></div>
+              <div class="item"><span style="color:var(--purple);flex-shrink:0">→</span><span>Another MSP owner in their peer group mentions they transitioned off</span></div>
+              <div class="item"><span style="color:var(--purple);flex-shrink:0">→</span><span>Planning a hire at vCIO or practice lead level for the first time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">What the transition involves</div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">A well-managed PEO exit is a 60–90 day project</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+            <div style="background:var(--purple-light);border:1px solid var(--purple-border);border-radius:8px;padding:14px;">
+              <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 1</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:5px;">Full cost audit</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">Itemize the actual all-in PEO cost: admin fees, benefits premiums, payroll processing, workers comp markup. Most owners have never seen this number clearly.</div>
+            </div>
+            <div style="background:var(--purple-light);border:1px solid var(--purple-border);border-radius:8px;padding:14px;">
+              <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 2</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:5px;">Side-by-side comparison</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">Build a direct benefits scenario using a group health strategy. Show the plan design options, employee cost share, and employer cost per employee. Let the numbers make the case.</div>
+            </div>
+            <div style="background:var(--purple-light);border:1px solid var(--purple-border);border-radius:8px;padding:14px;">
+              <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 3</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:5px;">Transition plan</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">Map the HRIS, payroll, and compliance stack needed to replace the PEO bundle. Identify the right timing, usually aligned to benefits renewal and ideally January 1 for a clean calendar-year start.</div>
+            </div>
+            <div style="background:var(--purple-light);border:1px solid var(--purple-border);border-radius:8px;padding:14px;">
+              <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Step 4</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:5px;">Execute and onboard</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">Handle the PEO exit notice, stand up the group health plan, coordinate the HRIS transition, and communicate the change to employees. The broker owns this process end to end.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Competitive landscape at this stage</div>
+        <div class="comp-table">
+          <div class="comp-row"><div class="badge hi">high threat</div><div><div class="comp-name">The PEO itself</div><div class="comp-note">PEOs are not passive when an exit conversation starts. Many will restructure pricing, offer concessions, or assign a dedicated account rep. The broker needs to show that the delta even after PEO concessions still favors a direct strategy, and that flexibility is a permanent feature of the transition, not a one-time deal.</div></div></div>
+          <div class="comp-row"><div class="badge med">medium threat</div><div><div class="comp-name">Generalist brokers who stumble into the conversation</div><div class="comp-note">A P&C broker who holds the MSP's cyber or E&O policy may see the renewal conversation as a benefits cross-sell opportunity. They won't have MSP-specific knowledge but they have an existing relationship. Differentiating on niche expertise wins this matchup consistently.</div></div></div>
+          <div class="comp-row"><div class="badge lo">low threat</div><div><div class="comp-name">PEO brokers / consultants</div><div class="comp-note">Consultants who specialize in PEO placement are not incentivized to move clients off PEOs. They may offer a PEO-to-PEO transition but rarely a PEO-to-direct one. Not a meaningful competitive threat in the transition segment.</div></div></div>
+        </div>
+        <div class="white-box" style="background:var(--purple-light);border:1px solid var(--purple-border);">
+          <div class="white-box-label" style="color:var(--purple)">White space</div>
+          <div class="white-box-txt">No broker is actively positioned as the MSP PEO-exit specialist. The transition itself is well-documented and predictable, but most MSP owners at this stage are either waiting for someone to bring it to them or dealing with the friction of figuring it out alone. A broker who shows up already knowing the process, already speaking the MSP's financial language, and already trusted by the owner earns this engagement with almost no competition.</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Ready to Transition Segment · 20–35 Employees</span>
+        <span>San Diego · May 2026</span>
+      </div>
+    </div>
+
+    <!-- CHANNELS PANEL -->
+    <div id="channels" class="panel">
+      <div class="hero" style="background:linear-gradient(135deg, #181512, #2a2117);">
+        <div>
+          <div class="hero-eyebrow" style="color:var(--amber-border)">Access Strategy · National + Local San Diego</div>
+          <div class="hero-title">Where to find them, how to show up</div>
+          <div class="hero-tag">MSPs don't respond to cold outreach the way other industries might. Access in this community is built through presence, peer endorsement, and vendor ecosystem relationships. The channels below are ranked by trust density, not just attendance size.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label" style="color:var(--purple);">San Diego and Southern California, local priority</div>
+        <div class="ch-list">
+          <div class="ch-row" style="border-color:var(--purple-border);border-left:3px solid var(--purple);">
+            <div class="badge local ch-badge" style="background:var(--purple-light);color:var(--purple)">local · 2026</div>
+            <div>
+              <div class="ch-name">ChannelCon 2026, San Diego, August 3–5</div>
+              <div class="ch-note">Flagship conference of GTIA (the nonprofit successor to CompTIA's community division), vendor-neutral, and specifically business-operations focused for MSP owners. Having this land in San Diego this year is a rare local access point to a national MSP audience. Owner and executive attendance. Priority event for any San Diego-based broker in 2026.</div>
+            </div>
+          </div>
+          <div class="ch-row" style="border-left:3px solid var(--purple);">
+            <div class="badge local ch-badge" style="background:var(--purple-light);color:var(--purple)">local</div>
+            <div>
+              <div class="ch-name">AITP San Diego (Association of IT Professionals)</div>
+              <div class="ch-note">Local chapter with regular events including a well-attended annual kickoff. Skews toward IT professionals and small MSP operators. Lower barrier to entry than national shows, higher relationship density per conversation. Good for early introductions and referral network building.</div>
+            </div>
+          </div>
+          <div class="ch-row" style="border-left:3px solid var(--purple);">
+            <div class="badge local ch-badge" style="background:var(--purple-light);color:var(--purple)">local</div>
+            <div>
+              <div class="ch-name">San Diego defense and biotech IT vendor ecosystem</div>
+              <div class="ch-note">San Diego's CMMC-compliance and HIPAA-adjacent MSP market is a distinct sub-niche. MSPs serving defense contractors or life sciences companies are more likely to already be thinking about professional infrastructure, including benefits. Target these specifically through defense industry contractor events and biotech vendor networking.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">National conferences worth traveling to</div>
+        <div class="ch-list">
+          <div class="ch-row"><div class="badge conf ch-badge">conference</div><div><div class="ch-name">IT Nation Connect (ConnectWise), Orlando, November</div><div class="ch-note">The anchor event of the MSP year. 4,000+ attendees, 120+ sessions, and the strongest concentration of MSP owners and operators of any event on the calendar. Strategy, Growth and M&A track is the right room for a benefits-focused conversation.</div></div></div>
+          <div class="ch-row"><div class="badge conf ch-badge">conference</div><div><div class="ch-name">MSP Summit, Orlando, September 2026</div><div class="ch-note">1,500+ MSP pros; vendor-neutral peer-led format; MSP 501 award community attends. Good mix of owner-operators across all size ranges. Less vendor-heavy than IT Nation.</div></div></div>
+          <div class="ch-row"><div class="badge conf ch-badge">conference</div><div><div class="ch-name">Kaseya Connect (formerly DattoCon), annual</div><div class="ch-note">2,000+ attendees; strong owner attendance; Kaseya's client base skews toward independent MSPs rather than large enterprise, which matches the target segments here.</div></div></div>
+          <div class="ch-row"><div class="badge conf ch-badge">conference</div><div><div class="ch-name">ASCII Edge, multi-city regional series</div><div class="ch-note">Two-day regional events built specifically for MSP owners and operators. Vendor-neutral, practitioner-led, and designed for actionable business education. Smaller crowds mean faster relationship-building. A Los Angeles or Las Vegas ASCII Edge date is a practical starting point from San Diego.</div></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Peer groups, where trust is actually built</div>
+        <div class="ch-list">
+          <div class="ch-row"><div class="badge assoc ch-badge">peer group</div><div><div class="ch-name">IT Nation Evolve (formerly HTG, via ConnectWise)</div><div class="ch-note">Curated groups of 10–12 non-competing MSP owners who meet quarterly and share financials, strategies, and vendor relationships. The highest-trust environment in the MSP channel. Getting endorsed by a member or facilitator inside one of these groups is worth more than any conference booth.</div></div></div>
+          <div class="ch-row"><div class="badge assoc ch-badge">peer group</div><div><div class="ch-name">GTIA member communities and interest groups</div><div class="ch-note">GTIA (rebranded from CompTIA community) runs member-led regional communities and interest groups across North America. These are smaller, ongoing groups, not just annual events. More durable relationship infrastructure than conference attendance alone.</div></div></div>
+          <div class="ch-row"><div class="badge assoc ch-badge">peer group</div><div><div class="ch-name">MSPGeekCon community and Slack</div><div class="ch-note">Community-built by MSP operators for MSP teams. Active Slack community alongside the annual conference. Authentic peer-to-peer environment with low vendor noise, which means credible contributions stand out. Useful for building awareness before in-person access.</div></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Referral and ecosystem channels</div>
+        <div class="ch-list">
+          <div class="ch-row"><div class="badge ref ch-badge">referral</div><div><div class="ch-name">PSA and RMM vendor partner programs (ConnectWise, Kaseya, NinjaOne)</div><div class="ch-note">MSPs are deeply embedded in their PSA and RMM vendor ecosystems. These vendors run partner programs, marketplaces, and referral networks. Getting listed as a recommended business services partner, or getting a warm introduction from a vendor account rep, is the fastest trust shortcut in this channel.</div></div></div>
+          <div class="ch-row"><div class="badge ref ch-badge">referral</div><div><div class="ch-name">MSP-focused accountants and fractional CFOs</div><div class="ch-note">A growing segment of accountants and CFOs specialize specifically in MSP financials. They co-serve the same 20–35 employee owners who are ready for the PEO transition. Natural referral partner: they see the PEO line item on the P&L and can refer the conversation.</div></div></div>
+          <div class="ch-row"><div class="badge ref ch-badge">referral</div><div><div class="ch-name">HRIS and payroll vendors (Rippling, Gusto, BambooHR)</div><div class="ch-note">When an MSP decides to exit a PEO, they need a new payroll and HRIS platform. These vendors are often the first call. A referral partnership with an HRIS vendor creates a two-sided flow: they refer the broker conversation, the broker refers the HRIS setup.</div></div></div>
+          <div class="ch-row"><div class="badge media ch-badge">media</div><div><div class="ch-name">ChannelFutures, MSPmentor, Channel Pro Network</div><div class="ch-note">Trade media read by MSP owners and operators. Bylined articles on benefits strategy, PEO transitions, or HR infrastructure build credibility with an audience who will not find you through traditional broker channels. The content strategy that works in this niche is education-first, vendor-second.</div></div></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Channel and Access Map · San Diego</span>
+        <span>Research compiled May 2026</span>
+      </div>
+    </div>
+
+    <!-- GEO STRATEGY PANEL -->
+    <div id="geo" class="panel">
+      <div class="hero" style="background:linear-gradient(135deg, #181210, #2e2010);">
+        <div>
+          <div class="hero-eyebrow" style="color:var(--amber-border)">Geographic Scale Strategy · Local, Regional, National</div>
+          <div class="hero-title">Start where you know it cold. Scale when the model is proven.</div>
+          <div class="hero-tag">The MSP growth-stage model works in every market, but the compliance landscape varies significantly by state. California is home base and the most complex environment. The surrounding region extends the book naturally. National is where the model scales through channel presence, not geographic expansion.</div>
+        </div>
+      </div>
+
+      <!-- TIER OVERVIEW -->
+      <div class="section">
+        <div class="sec-label">The three-tier geographic model</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px;">
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#181210,#2e2010);padding:18px 20px;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber-border);margin-bottom:6px;">Tier 1 · Home Market</div>
+              <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;">California</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.6);">San Diego anchor · statewide upside</div>
+            </div>
+            <div style="padding:16px 18px;">
+              <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px;">Most complex compliance environment in the country. That complexity is the competitive moat. A broker who knows CA-specific rules cold is immediately differentiated from any out-of-state or generalist competitor walking into this market.</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--amber-bright);flex-shrink:0;font-weight:700;">✓</span><span>Cal-COBRA and CCSB expertise</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--amber-bright);flex-shrink:0;font-weight:700;">✓</span><span>CA PEO registration requirements</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--amber-bright);flex-shrink:0;font-weight:700;">✓</span><span>AB 5 contractor exposure surfacing</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--amber-bright);flex-shrink:0;font-weight:700;">✓</span><span>CA individual mandate compliance</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--amber-bright);flex-shrink:0;font-weight:700;">✓</span><span>Regional carrier relationships</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#1c1530,#2e1e4a);padding:18px 20px;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#b0aadc;margin-bottom:6px;">Tier 2 · Regional</div>
+              <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;">AZ · NV · OR · WA</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.6);">Adjacent MSP markets · federal-primary rules</div>
+            </div>
+            <div style="padding:16px 18px;">
+              <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px;">Surrounding states operate primarily under federal rules with fewer state-level mandates. The core PEO transition model applies cleanly and without the CA compliance complexity. Natural expansion through the same conference circuit and vendor referral networks.</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--purple);flex-shrink:0;font-weight:700;">✓</span><span>Phoenix and Las Vegas: fast-growing MSP markets</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--purple);flex-shrink:0;font-weight:700;">✓</span><span>Seattle and Portland: dense tech ecosystems</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--purple);flex-shrink:0;font-weight:700;">✓</span><span>Same ASCII Edge and peer group circuits</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--purple);flex-shrink:0;font-weight:700;">→</span><span style="color:var(--text-muted);">Oregon has its own mandate, for awareness</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--purple);flex-shrink:0;font-weight:700;">→</span><span style="color:var(--text-muted);">WA has continuation rules, for awareness</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#141210,#242018);padding:18px 20px;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:6px;">Tier 3 · Horizon</div>
+              <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;">National</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.5);">Conference-led · not geography-led</div>
+            </div>
+            <div style="padding:16px 18px;">
+              <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px;">National reach is earned through channel presence and peer group reputation, not a field sales expansion. IT Nation, MSP Summit, and the vendor ecosystem do not care where you are headquartered. The model scales through trust, not geography.</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--text-faint);flex-shrink:0;">✓</span><span style="color:var(--text-muted);">Federal rules apply cleanly in most states</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--text-faint);flex-shrink:0;">✓</span><span style="color:var(--text-muted);">IT Nation Connect and MSP Summit as primary access</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--text-faint);flex-shrink:0;">✓</span><span style="color:var(--text-muted);">Peer group endorsement travels nationally</span></div>
+                <div style="display:flex;gap:8px;font-size:12px;"><span style="color:var(--text-faint);flex-shrink:0;">→</span><span style="color:var(--text-muted);">State-specific compliance varies: always verify before placing</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CA SECTION -->
+      <div class="section">
+        <div class="sec-label">
+          <span style="background:var(--amber-light);color:var(--amber-bright);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em;">California clients only</span>
+          California-specific compliance layer
+        </div>
+        <div style="background:var(--amber-xlight);border:1px solid var(--amber-border);border-radius:10px;padding:6px;margin-bottom:16px;">
+          <div style="background:var(--white);border-radius:8px;overflow:hidden;">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border-light);display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--amber-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;">⚖️</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;margin-bottom:3px;">CA PEO registration requirement</div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">California requires PEOs to register with the Employment Development Department (EDD) as a licensed employer. Not all nationally operating PEOs are properly structured for California co-employment. An MSP owner who doesn't know this may be in a PEO arrangement that creates unintended compliance and tax liability. Surfacing this in the audit conversation immediately demonstrates CA-specific expertise.</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border-light);display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--amber-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;">🔁</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;margin-bottom:3px;">Cal-COBRA: continuation coverage for groups of 2–19</div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">Federal COBRA only applies to employers with 20 or more employees. California's own continuation coverage law, Cal-COBRA, applies to groups of 2–19. This matters directly for the 20–35 employee transition segment: when an MSP exits a PEO near that threshold, continuation coverage obligations are different than they would be in a non-mandate state. Getting this wrong during a PEO exit creates real employee-facing exposure. <strong>This is a CA-only consideration.</strong></div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border-light);display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--amber-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;">🏥</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;margin-bottom:3px;">Covered California for Small Business (CCSB)</div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">California operates its own small group exchange available to employers with 1–100 employees. CCSB is a legitimate option alongside the fully insured commercial market for MSPs coming off a PEO at 25–35 employees. Most generalist brokers don't walk CA clients through this comparison. A broker who does is providing something genuinely different. <strong>This is a CA-only option.</strong></div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border-light);display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--amber-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;">📋</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;margin-bottom:3px;">California individual mandate</div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">California reinstated its own individual mandate after the federal penalty went to zero. Employees are required to maintain coverage or pay a state tax penalty. This affects how employees evaluate plan options and what employers need to communicate during open enrollment. MSP owners who've been in a PEO haven't had to manage this communication layer directly. <strong>This is a CA-only compliance requirement.</strong></div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border-light);display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--amber-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;">👷</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;margin-bottom:3px;">AB 5 contractor classification risk</div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">California's AB 5 is one of the most aggressive contractor classification laws in the country. Many MSPs use 1099 contractors for overflow helpdesk work or project-based engineering. If those workers are misclassified under CA law, they may have benefits entitlements that create exposure. Surfacing this during a PEO audit conversation adds immediate, concrete value well beyond the benefits question. <strong>This is a CA-only legal issue. Do not raise with out-of-state clients.</strong></div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--amber-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;">🏦</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;margin-bottom:3px;">San Diego carrier market</div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">The dominant carriers in San Diego are regional: Kaiser Permanente, Sharp Health Plan, Blue Shield of California, and Anthem Blue Cross CA. Network adequacy, cost structure, and plan design vary significantly from national defaults. A broker quoting a San Diego MSP needs to be working with the right carriers for this specific market, not defaulting to what they'd quote in Arizona or Nevada. <strong>Carrier market is San Diego and Southern CA specific.</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--amber-xlight);border:1px solid var(--amber-border);border-radius:8px;padding:13px 16px;font-size:13px;color:var(--text-muted);line-height:1.6;">
+          <strong style="color:var(--amber-bright);">How to use this layer:</strong> The CA compliance items above are entry-point conversation starters, not just disclosures. Each one represents something a CA-based MSP owner is exposed to that their current generalist broker almost certainly has not surfaced. Leading with even one of these in an audit conversation signals expertise that has nothing to do with quoting.
+        </div>
+      </div>
+
+      <!-- REGIONAL SECTION -->
+      <div class="section">
+        <div class="sec-label">
+          <span style="background:var(--purple-light);color:var(--purple);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em;">Regional</span>
+          Surrounding states: AZ, NV, OR, WA
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+              <div class="card-title">Arizona</div>
+              <div style="font-size:10px;font-weight:700;background:var(--green-light);color:var(--green);padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;">Federal rules apply</div>
+            </div>
+            <div class="card-body">Phoenix has one of the fastest-growing MSP markets in the country, driven by remote work migration and financial services demand. No AB 5 equivalent, no state individual mandate, no additional PEO registration layer. The core PEO transition model applies cleanly. ASCII Edge runs regional events in the Southwest that reach Phoenix-based MSPs from San Diego.</div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+              <div class="card-title">Nevada</div>
+              <div style="font-size:10px;font-weight:700;background:var(--green-light);color:var(--green);padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;">Federal rules apply</div>
+            </div>
+            <div class="card-body">Las Vegas has a growing hospitality-focused MSP market, and Reno has a manufacturing and logistics tech base. No state income tax in Nevada makes benefits a more important total compensation lever than in CA. Federal rules apply cleanly. The Channel Partners Conference and MSP Summit co-located event is held in Las Vegas each spring, making it a natural venue for both attending and building relationships with NV-based MSPs.</div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+              <div class="card-title">Oregon</div>
+              <div style="font-size:10px;font-weight:700;background:var(--amber-light);color:var(--amber-bright);padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;">Note: state mandate</div>
+            </div>
+            <div class="card-body">Portland has a dense mid-market tech services ecosystem. Oregon has its own individual mandate, similar in concept to California's, but with its own rules and penalty structure. Brokers serving Oregon MSPs should be aware of this before placing groups. Less complex than CA overall, but not a pure federal-rules environment.</div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+              <div class="card-title">Washington</div>
+              <div style="font-size:10px;font-weight:700;background:var(--amber-light);color:var(--amber-bright);padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;">Note: continuation rules</div>
+            </div>
+            <div class="card-body">Seattle and Bellevue are among the densest MSP markets in the country, serving Microsoft, Amazon, and defense contractor ecosystems. Washington has its own continuation coverage rules and a state-run long-term care mandate (WA Cares Fund) that affects employer benefits conversations. No state income tax, but the B&O tax structure is unique. High-value market with some state-specific notes to carry.</div>
+          </div>
+        </div>
+        <div style="background:var(--purple-light);border:1px solid var(--purple-border);border-radius:8px;padding:13px 16px;font-size:13px;color:var(--text-muted);line-height:1.6;">
+          <strong style="color:var(--purple);">Regional expansion principle:</strong> The same conference circuit, vendor partner programs, and ASCII Edge regional events that build the San Diego book naturally extend into AZ and NV. Oregon and Washington require slightly more state-specific preparation but are reachable through IT Nation and the vendor ecosystem. No new infrastructure is needed to expand regionally, the channels are the same channels.
+        </div>
+      </div>
+
+      <!-- NATIONAL SECTION -->
+      <div class="section">
+        <div class="sec-label">
+          <span style="background:var(--charcoal-mid);color:#d8d0c0;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em;">National</span>
+          How small brokerages scale nationally without a field team
+        </div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:12px;">The channel-first national model</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+            <div style="background:var(--off-white);border:1px solid var(--border);border-radius:8px;padding:14px;">
+              <div style="font-size:12px;font-weight:700;margin-bottom:5px;">Peer group endorsement</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">A recommendation inside an IT Nation Evolve peer group reaches 10–12 MSP owners who each know dozens more. Geography is irrelevant in that room; owners work with trusted vendors regardless of where they're based. One peer group relationship scales nationally faster than any field expansion.</div>
+            </div>
+            <div style="background:var(--off-white);border:1px solid var(--border);border-radius:8px;padding:14px;">
+              <div style="font-size:12px;font-weight:700;margin-bottom:5px;">National conference presence</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">IT Nation Connect (Orlando) and MSP Summit draw MSPs from every state. Attending as a vendor, presenter, or sponsor builds a nationally distributed relationship network from a single annual trip. The cost of attendance is a fraction of what field expansion would require.</div>
+            </div>
+            <div style="background:var(--off-white);border:1px solid var(--border);border-radius:8px;padding:14px;">
+              <div style="font-size:12px;font-weight:700;margin-bottom:5px;">Trade media and content</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">A bylined article in ChannelFutures or MSPmentor on PEO transitions, benefits benchmarking, or HR infrastructure for growing MSPs is read nationally. Content-driven credibility is a small brokerage's most efficient national distribution channel.</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--charcoal-mid);border-radius:8px;padding:16px 18px;color:rgba(255,255,255,.75);font-size:13px;line-height:1.65;">
+          <strong style="color:#e8d8b8;display:block;margin-bottom:6px;">The honest national constraint:</strong>
+          National MSP prospects outside CA require state-specific license verification before placing coverage. Every state has its own broker licensing requirements. This is manageable and routine, but it is not zero-cost operationally. The practical national strategy for a small brokerage is to let inbound demand pull the licensing expansion rather than proactively chasing every state. Build the reputation nationally through channels. Let the clients find you. Then get licensed in their state when the relationship warrants it.
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Geographic Scale Strategy · Local, Regional, National</span>
+        <span>Research compiled May 2026</span>
+      </div>
+    </div>
+
+    <!-- GLOSSARY PANEL -->
+    <div id="glossary" class="panel">
+      <div class="hero" style="background:linear-gradient(135deg,#181512,#2a2010);">
+        <div>
+          <div class="hero-eyebrow" style="color:var(--amber-border)">MSP Terminology Reference</div>
+          <div class="hero-title">Speak their language from day one</div>
+          <div class="hero-tag">MSP owners have a distinct vocabulary built around how they price, operate, and grow their businesses. Using the right terms signals that you understand their world. Using the wrong ones signals that you don't. This glossary covers the terms that come up most in MSP business conversations, organized by category.</div>
+        </div>
+      </div>
+
+      <!-- BUSINESS MODEL -->
+      <div class="section">
+        <div class="sec-label">Business model and financials</div>
+        <div style="display:flex;flex-direction:column;gap:1px;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">MRR</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Monthly Recurring Revenue</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">The primary health metric of an MSP's business. Total contracted monthly revenue from managed services agreements. When an MSP owner says "we're at $200K MRR," they mean $200,000 in monthly recurring contract revenue. This is how they think about business size, not headcount or annual revenue.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">ARR</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Annual Recurring Revenue</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">MRR multiplied by 12. Used when discussing valuations, growth trajectory, or comparing to industry benchmarks. A $200K MRR MSP has $2.4M ARR. PE buyers and acquirers typically value MSPs as a multiple of ARR.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Per-seat / per-device</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Pricing model</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">How most MSPs price their services. Per-seat means charging a fixed monthly amount per employee (or user). Per-device means charging per managed endpoint (computer, server, firewall). An MSP quoting "$85 per seat per month" is charging $85 per employee per month for their managed services. This is directly analogous to how a broker should frame benefits costs to an MSP owner.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Break-fix</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Legacy pricing model</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">The old way of doing IT: a client calls when something breaks and pays an hourly rate to fix it. No recurring contract, no predictable revenue. Most modern MSPs started in break-fix and transitioned to recurring managed services. An MSP still doing significant break-fix work is earlier-stage and less financially stable.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Churn</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Client attrition rate</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">The percentage of MRR lost each month from clients who cancel or reduce their contracts. High churn is the primary threat to MSP valuations. A low-churn MSP (under 2% monthly) is far more valuable and stable than a high-growth MSP losing 5% of revenue per month. Asking about churn tells you a lot about the health of the business.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Utilization rate</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Technician efficiency</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">The percentage of a technician's working hours that are billable or applied to managed services contracts. An MSP targeting 75-80% utilization means they want technicians spending that share of their time on client work. Low utilization means overstaffed or undercontracted. High utilization means the team is stretched and retention pressure is higher.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">QBR</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Quarterly Business Review</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">A quarterly meeting between the MSP and each of its clients to review performance, discuss upcoming needs, and strengthen the relationship. QBRs are how MSPs demonstrate value and protect against churn. A broker who frames their own annual renewal process as a QBR-style conversation will immediately earn credibility.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TOOLS AND TECH -->
+      <div class="section">
+        <div class="sec-label">Tools and infrastructure</div>
+        <div style="display:flex;flex-direction:column;gap:1px;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">PSA</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Professional Services Automation</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">The operational backbone of an MSP. Handles ticketing, time tracking, invoicing, project management, and client communication in one platform. The dominant PSAs are ConnectWise Manage, Autotask (Kaseya), and HaloPSA. Asking which PSA an MSP uses tells you a lot about how sophisticated their operations are.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">RMM</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Remote Monitoring and Management</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">The tool MSPs use to monitor, manage, and deploy software to client devices remotely without physically being on-site. The major RMM platforms are NinjaOne, ConnectWise Automate, Kaseya VSA, and Datto RMM. An MSP without a strong RMM is not operating at scale. These platforms also run the vendor partner programs that are key access channels.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Stack</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Technology stack</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">The collection of tools and platforms an MSP uses to deliver its services: PSA, RMM, security tools, backup, documentation platform, and so on. MSPs are deeply attached to their stack choices. Vendors who integrate with or complement the stack get more traction than those who don't.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">NOC</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Network Operations Center</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">A team (internal or outsourced) that monitors client networks and responds to alerts around the clock. Larger MSPs run their own NOC; smaller ones outsource it. An MSP with a NOC is operating at a higher service tier and typically has more complex client relationships and higher per-seat pricing.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">SOC</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Security Operations Center</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">Like a NOC but focused specifically on cybersecurity monitoring, threat detection, and incident response. MSPs that run or outsource a SOC are operating as MSSPs (Managed Security Service Providers) and typically serve clients in regulated verticals. These firms tend to be more sophisticated, better-resourced, and more stable.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">MSSP</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Managed Security Service Provider</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">An MSP that specializes in cybersecurity services: threat monitoring, incident response, compliance management, and security tooling. MSSPs are typically more profitable than generalist MSPs and serve larger clients. The talent they're recruiting (security engineers, threat analysts) is among the most competitive in the IT labor market.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ROLES -->
+      <div class="section">
+        <div class="sec-label">Roles and titles</div>
+        <div style="display:flex;flex-direction:column;gap:1px;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">vCIO</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Virtual Chief Information Officer</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">A senior strategic role at an MSP, typically the person who serves as a fractional CIO for the MSP's clients, helping them plan their technology roadmap, budget for IT, and align tech decisions with business goals. vCIOs are among the highest-compensated staff at an MSP (typically $120–200K+) and are the hardest to recruit. When an MSP starts hiring at the vCIO level, that is a strong signal they're ready for a more sophisticated benefits conversation.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Level 1 / L1 tech</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Entry-level helpdesk</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">Entry-level technicians who handle basic helpdesk requests: password resets, software installs, printer issues. Typically $45–60K. High turnover. These are the employees most affected by the benefits gap between a PEO master plan and a customized direct strategy.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Level 2 / L2 tech</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Mid-level engineer</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">More experienced technicians who handle escalated tickets, server administration, networking, and more complex troubleshooting. Typically $65–95K. The core of most MSP delivery teams and the most important retention target for a growing MSP.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Service manager / dispatcher</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Operations role</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">The person who routes incoming tickets to the right technician, manages SLAs, and keeps the service board moving. Often the first non-technical hire an MSP makes. In smaller shops, the owner does this themselves. This person is often the de facto HR contact and may be the one who actually manages the PEO relationship.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- COMMUNITY AND CHANNEL -->
+      <div class="section">
+        <div class="sec-label">Community, channel, and culture</div>
+        <div style="display:flex;flex-direction:column;gap:1px;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">The channel</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">The MSP ecosystem</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">When MSPs say "the channel," they mean the entire ecosystem of MSPs, vendors, distributors, and service providers that make up the IT services industry. Being "in the channel" means you operate within and understand this ecosystem. Vendors who sell to MSPs are "channel companies." A broker who wants to reach MSPs needs to become a known quantity in the channel.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Peer group</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Curated owner community</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">Small, curated groups of non-competing MSP owners (typically 10–15) who meet quarterly to share financials, operational data, and business strategies. IT Nation Evolve (formerly HTG) is the most prominent peer group program. These are the highest-trust environments in the channel. A recommendation from inside a peer group is the most powerful introduction a vendor can get.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">EOS</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Entrepreneurial Operating System</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">A business management framework from Gino Wickman's book "Traction" that is almost universally adopted across the MSP industry. If an MSP owner mentions "rocks," "the L10," "the IDS," "Level 10 meetings," or "Visionary/Integrator," they're running EOS. Knowing what EOS is signals immediately that you've spent time around MSP owners.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">MSP 501</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Annual industry ranking</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">The annual ranking of the top 501 MSPs globally, published by Channel Futures / MSP Summit. Being on the MSP 501 is a significant credibility marker within the community. Owners track it. If a prospect mentions they've been ranked, they're proud of it. Referencing the MSP 501 in conversation signals you know the industry.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">Co-managed IT</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Hybrid service model</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">A service model where the MSP works alongside a client's existing internal IT team rather than replacing it. The MSP handles overflow, specialized tasks, or 24/7 coverage. Co-managed IT tends to serve mid-market clients (100–500 employees) and represents a growing revenue segment for MSPs scaling beyond the SMB market.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">CMMC</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Cybersecurity Maturity Model Certification</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">A Department of Defense cybersecurity certification framework required for MSPs and IT firms serving defense contractors. CMMC-certified MSPs have cleared a rigorous compliance process and are typically more operationally mature, better-documented, and less likely to be rolled up by a generalist PE firm. In San Diego's defense-heavy market, CMMC is a key qualifier.</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:220px 1fr;background:var(--white);border-top:1px solid var(--border-light);">
+            <div style="padding:16px 20px;border-right:1px solid var(--border-light);background:var(--off-white);">
+              <div style="font-size:15px;font-weight:700;">SLA</div>
+              <div style="font-size:12px;color:var(--text-faint);margin-top:2px;">Service Level Agreement</div>
+            </div>
+            <div style="padding:16px 20px;font-size:14px;color:var(--text-muted);line-height:1.6;">Contractual commitments to clients about response times, resolution times, and uptime. SLAs are what MSPs are held accountable to. A missed SLA costs the MSP money (via contract penalties) or clients (via churn). High SLA pressure on the team = high stress = retention risk = benefits matter more.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- QUICK REFERENCE -->
+      <div class="section">
+        <div class="sec-label">How to use this in a conversation</div>
+        <div style="background:var(--charcoal);border-radius:12px;padding:24px 28px;color:rgba(255,255,255,.85);">
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:16px;">Phrases that earn credibility immediately</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="background:rgba(255,255,255,.07);border-radius:8px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber-border);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Instead of saying</div>
+              <div style="font-size:14px;color:rgba(255,255,255,.6);font-style:italic;">"How many employees do you have?"</div>
+            </div>
+            <div style="background:rgba(200,133,26,.12);border-radius:8px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber-border);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Say this</div>
+              <div style="font-size:14px;color:#fff;">"What's your current headcount, and are most of them technicians or do you have a mix of vCIOs and engineers on the team?"</div>
+            </div>
+            <div style="background:rgba(255,255,255,.07);border-radius:8px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber-border);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Instead of saying</div>
+              <div style="font-size:14px;color:rgba(255,255,255,.6);font-style:italic;">"How much revenue does your company make?"</div>
+            </div>
+            <div style="background:rgba(200,133,26,.12);border-radius:8px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber-border);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Say this</div>
+              <div style="font-size:14px;color:#fff;">"What does your MRR look like right now, and has growth been pretty steady over the last couple of years?"</div>
+            </div>
+            <div style="background:rgba(255,255,255,.07);border-radius:8px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber-border);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Instead of saying</div>
+              <div style="font-size:14px;color:rgba(255,255,255,.6);font-style:italic;">"We can help you get better benefits for less money."</div>
+            </div>
+            <div style="background:rgba(200,133,26,.12);border-radius:8px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber-border);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Say this</div>
+              <div style="font-size:14px;color:#fff;">"Most MSPs at your stage are paying their PEO somewhere between $150 and $200 per seat per month all-in. I'd like to show you what that number actually breaks down to and what you could do differently."</div>
+            </div>
+            <div style="background:rgba(255,255,255,.07);border-radius:8px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber-border);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Instead of saying</div>
+              <div style="font-size:14px;color:rgba(255,255,255,.6);font-style:italic;">"Are you happy with your current HR setup?"</div>
+            </div>
+            <div style="background:rgba(200,133,26,.12);border-radius:8px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber-border);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">Say this</div>
+              <div style="font-size:14px;color:#fff;">"Are you still on a PEO, or have you moved to a direct setup? And when you're recruiting at the L2 and vCIO level, are benefits coming up in those conversations?"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>MSP Terminology Glossary · Reference Guide</span>
+        <span>Research compiled May 2026</span>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
