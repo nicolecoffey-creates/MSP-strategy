@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MSP Benefits Transition Infrastructure</title>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto',sans-serif; background:#111110; color:#f0e8d8; }
+.app { min-height:100vh; }
+.main-nav { position:sticky; top:0; z-index:100; background:rgba(17,17,16,.97); backdrop-filter:blur(12px); border-bottom:1px solid rgba(232,196,122,.15); padding:1.25rem 2rem; display:flex; justify-content:center; }
+.nav-links { display:flex; gap:.5rem; }
+.nav-links button { padding:.625rem 1.25rem; background:transparent; border:1px solid transparent; color:#9e9688; font-size:.9375rem; font-weight:500; cursor:pointer; border-radius:6px; transition:all .2s; }
+.nav-links button:hover { color:#f0e8d8; background:rgba(232,196,122,.06); }
+.nav-links button.active { color:#fff; background:rgba(232,196,122,.1); border-color:rgba(232,196,122,.2); }
+.main-content { max-width:1400px; margin:0 auto; padding:3rem 2rem; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.overview-section,.toolkit-section,.assets-section { animation:fadeIn .4s ease-in-out; }
+.hero-content { text-align:center; padding:3rem 0; }
+.hero-title { font-size:3.5rem; font-weight:700; line-height:1.1; letter-spacing:-.02em; color:#fff; margin-bottom:1.5rem; }
+.hero-title span { color:#c8851a; }
+.hero-description { font-size:1.25rem; line-height:1.6; color:#9e9688; max-width:860px; margin:0 auto; }
+.overview-stats { display:flex; justify-content:center; gap:4rem; padding:2rem 0 3rem; }
+.stat-block { text-align:center; }
+.stat-number { font-size:3rem; font-weight:700; color:#c8851a; margin-bottom:.5rem; }
+.stat-label { font-size:.9375rem; color:#9e9688; max-width:200px; }
+.why-section { margin-bottom:4rem; }
+.why-section h2,.model-primer h2 { font-size:2rem; font-weight:700; color:#fff; margin-bottom:2rem; text-align:center; }
+.why-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
+.why-card { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; }
+.why-icon { width:56px; height:56px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#c8851a,#a06010); border-radius:12px; margin-bottom:1.5rem; color:#fff; font-size:1.5rem; }
+.why-card h3 { font-size:1.25rem; font-weight:600; color:#fff; margin-bottom:1rem; }
+.why-card p { color:#9e9688; line-height:1.7; }
+.model-primer { margin-bottom:4rem; }
+.primer-flow { display:flex; align-items:stretch; gap:1rem; }
+.primer-step { flex:1; padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; }
+.primer-label { font-size:1.125rem; font-weight:600; color:#fff; margin-bottom:.75rem; }
+.primer-detail { color:#9e9688; line-height:1.6; }
+.primer-arrow { display:flex; align-items:center; color:#c8851a; font-size:1.5rem; }
+.overview-nav-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:2rem; }
+.nav-card { padding:2.5rem; background:rgba(240,232,216,.03); border:2px solid rgba(240,232,216,.1); border-radius:16px; cursor:pointer; transition:all .3s; }
+.nav-card:hover { background:rgba(240,232,216,.05); border-color:rgba(200,133,26,.4); transform:translateY(-4px); }
+.nav-card .nc-icon { color:#c8851a; margin-bottom:1.5rem; font-size:1.75rem; }
+.nav-card h3 { font-size:1.5rem; font-weight:600; color:#fff; margin-bottom:.75rem; }
+.nav-card p { color:#9e9688; line-height:1.6; margin-bottom:1.5rem; }
+.nav-card-link { display:inline-flex; align-items:center; gap:.5rem; color:#e8c47a; font-weight:600; }
+.section-header { margin-bottom:3rem; text-align:center; }
+.section-title { font-size:2.5rem; font-weight:700; color:#fff; margin-bottom:1rem; }
+.section-intro { font-size:1.125rem; line-height:1.6; color:#9e9688; max-width:800px; margin:0 auto; }
+.nav-footer { margin-top:4rem; display:flex; justify-content:space-between; align-items:center; }
+.nav-button { display:flex; align-items:center; gap:.75rem; padding:.875rem 1.75rem; background:linear-gradient(135deg,#c8851a,#a06010); border:none; color:#fff; font-size:.9375rem; font-weight:600; border-radius:8px; cursor:pointer; transition:all .3s; }
+.nav-button:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(200,133,26,.4); }
+.nav-button.secondary { background:rgba(240,232,216,.08); border:1px solid rgba(240,232,216,.15); }
+.nav-button.secondary:hover { background:rgba(240,232,216,.12); box-shadow:none; }
+.toolkit-layout,.assets-layout { display:grid; grid-template-columns:280px 1fr; gap:3rem; }
+.toolkit-nav,.assets-nav { position:sticky; top:100px; height:fit-content; display:flex; flex-direction:column; gap:.5rem; }
+.toolkit-nav-item,.asset-nav-item { display:flex; align-items:center; gap:.75rem; padding:1rem 1.25rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:8px; color:#9e9688; font-size:.9375rem; font-weight:500; cursor:pointer; transition:all .2s; text-align:left; }
+.toolkit-nav-item:hover,.asset-nav-item:hover { background:rgba(240,232,216,.06); color:#f0e8d8; }
+.toolkit-nav-item.active,.asset-nav-item.active { background:rgba(200,133,26,.12); border-color:rgba(200,133,26,.35); color:#e8c47a; }
+.asset-nav-item { flex-direction:column; align-items:flex-start; gap:.5rem; }
+.asset-type { font-size:.75rem; font-weight:600; color:#6b6860; text-transform:uppercase; letter-spacing:.05em; }
+.subsection-content,.asset-demo { animation:fadeIn .3s ease-in-out; }
+.subsection-content h3,.asset-demo h3 { font-size:2rem; font-weight:600; color:#fff; margin-bottom:1rem; }
+.subsection-intro,.demo-intro { font-size:1.0625rem; line-height:1.6; color:#9e9688; margin-bottom:2.5rem; }
+.qualification-interactive { display:grid; grid-template-columns:1fr 380px; gap:2.5rem; }
+.criteria-checklist { display:flex; flex-direction:column; gap:1.5rem; }
+.criteria-category { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; }
+.category-title { font-size:1.25rem; font-weight:600; color:#fff; margin-bottom:1.5rem; }
+.criteria-items { display:flex; flex-direction:column; gap:1rem; }
+.criterion-checkbox { display:flex; align-items:center; gap:1rem; cursor:pointer; user-select:none; }
+.criterion-checkbox input { position:absolute; opacity:0; width:0; height:0; }
+.checkbox-custom { width:22px; height:22px; border:2px solid rgba(240,232,216,.3); border-radius:5px; display:flex; align-items:center; justify-content:center; transition:all .2s; flex-shrink:0; }
+.criterion-checkbox input:checked + .checkbox-custom { background:linear-gradient(135deg,#c8851a,#a06010); border-color:#c8851a; }
+.criterion-checkbox input:checked + .checkbox-custom::after { content:'\2713'; color:#fff; font-weight:700; font-size:.875rem; }
+.criterion-label { color:#f0e8d8; line-height:1.5; }
+.scoring-panel { position:sticky; top:100px; height:fit-content; display:flex; flex-direction:column; gap:1.5rem; }
+.score-display { padding:2.5rem; background:linear-gradient(135deg,rgba(200,133,26,.12),rgba(200,133,26,.06)); border:2px solid rgba(200,133,26,.3); border-radius:12px; text-align:center; }
+.score-number { font-size:4rem; font-weight:700; color:#c8851a; line-height:1; margin-bottom:.5rem; }
+.score-label { font-size:1.125rem; font-weight:600; color:#fff; margin-bottom:.5rem; }
+.score-fraction { font-size:.9375rem; color:#9e9688; }
+.qualification-result { padding:1.75rem; border-radius:12px; border:2px solid; }
+.qualification-result.high { background:rgba(16,185,129,.1); border-color:rgba(16,185,129,.3); }
+.qualification-result.medium { background:rgba(245,158,11,.1); border-color:rgba(245,158,11,.3); }
+.qualification-result.low { background:rgba(107,114,128,.1); border-color:rgba(107,114,128,.3); }
+.result-level { font-size:1.25rem; font-weight:700; margin-bottom:.75rem; }
+.qualification-result.high .result-level { color:#10b981; }
+.qualification-result.medium .result-level { color:#f59e0b; }
+.qualification-result.low .result-level { color:#9ca3af; }
+.result-action { color:#f0e8d8; line-height:1.6; }
+.scoring-guide-compact { display:flex; flex-direction:column; gap:.75rem; }
+.guide-item { display:flex; justify-content:space-between; align-items:center; padding:.875rem 1rem; background:rgba(240,232,216,.03); border:1px solid; border-radius:8px; }
+.guide-item.high { border-color:rgba(16,185,129,.3); }
+.guide-item.medium { border-color:rgba(245,158,11,.3); }
+.guide-item.low { border-color:rgba(107,114,128,.3); }
+.guide-range { font-weight:700; color:#fff; }
+.guide-label { font-size:.9375rem; color:#9e9688; }
+.reset-btn { padding:.75rem; background:rgba(240,232,216,.05); border:1px solid rgba(240,232,216,.15); color:#9e9688; font-size:.875rem; font-weight:600; border-radius:8px; cursor:pointer; transition:all .2s; }
+.reset-btn:hover { background:rgba(240,232,216,.1); color:#f0e8d8; }
+.readiness-interactive { display:flex; flex-direction:column; gap:1.5rem; margin-bottom:2.5rem; }
+.readiness-dimension { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; }
+.dimension-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.75rem; }
+.dimension-header h4 { font-size:1.25rem; font-weight:600; color:#fff; }
+.dimension-score { padding:.5rem 1.25rem; background:linear-gradient(135deg,#c8851a,#a06010); border-radius:6px; font-size:1.25rem; font-weight:700; color:#fff; }
+.readiness-questions { display:flex; flex-direction:column; gap:1rem; }
+.readiness-question { display:flex; justify-content:space-between; align-items:center; gap:2rem; padding:1.25rem; background:rgba(240,232,216,.05); border-radius:8px; }
+.question-text { flex:1; color:#f0e8d8; line-height:1.5; }
+.question-options { display:flex; gap:.5rem; flex-shrink:0; }
+.option-btn { padding:.5rem 1.1rem; background:rgba(240,232,216,.05); border:1px solid rgba(240,232,216,.1); color:#9e9688; font-size:.875rem; font-weight:600; border-radius:6px; cursor:pointer; transition:all .2s; }
+.option-btn:hover { background:rgba(240,232,216,.1); color:#f0e8d8; }
+.option-btn.selected.yes { background:linear-gradient(135deg,#10b981,#059669); border-color:#10b981; color:#fff; }
+.option-btn.selected.partial { background:linear-gradient(135deg,#f59e0b,#d97706); border-color:#f59e0b; color:#fff; }
+.option-btn.selected.no { background:linear-gradient(135deg,#ef4444,#dc2626); border-color:#ef4444; color:#fff; }
+.readiness-summary { padding:2.5rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:16px; display:flex; flex-direction:column; gap:2rem; }
+.summary-score { text-align:center; }
+.summary-number { font-size:4rem; font-weight:700; color:#c8851a; }
+.summary-label { font-size:1.125rem; font-weight:600; color:#fff; }
+.summary-breakdown { display:flex; flex-direction:column; gap:1.25rem; }
+.breakdown-item { display:flex; align-items:center; gap:1rem; }
+.breakdown-label { width:120px; font-weight:600; color:#9e9688; font-size:.9375rem; }
+.breakdown-bar { flex:1; height:12px; background:rgba(240,232,216,.1); border-radius:6px; overflow:hidden; }
+.breakdown-fill { height:100%; background:linear-gradient(135deg,#c8851a,#a06010); border-radius:6px; transition:width .5s ease; }
+.breakdown-value { width:50px; text-align:right; font-weight:700; color:#c8851a; }
+.recommendation { padding:1.75rem; border-radius:12px; border:2px solid; line-height:1.6; }
+.recommendation.high { background:rgba(16,185,129,.1); border-color:rgba(16,185,129,.3); color:#6ee7b7; }
+.recommendation.medium { background:rgba(245,158,11,.1); border-color:rgba(245,158,11,.3); color:#fbbf24; }
+.recommendation.low { background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.3); color:#fca5a5; }
+.recommendation strong { color:#fff; }
+.funding-education { display:flex; flex-direction:column; gap:2.5rem; }
+.funding-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+.funding-card { padding:2rem; border-radius:12px; border:2px solid; }
+.funding-card.peo { background:rgba(239,68,68,.05); border-color:rgba(239,68,68,.2); }
+.funding-card.fi { background:rgba(245,158,11,.05); border-color:rgba(245,158,11,.2); }
+.funding-card.lf { background:rgba(16,185,129,.05); border-color:rgba(16,185,129,.2); }
+.funding-card-header { display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; }
+.funding-badge { padding:.375rem .875rem; border-radius:6px; font-size:.8125rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+.funding-card.peo .funding-badge { background:rgba(239,68,68,.2); color:#fca5a5; }
+.funding-card.fi .funding-badge { background:rgba(245,158,11,.2); color:#fbbf24; }
+.funding-card.lf .funding-badge { background:rgba(16,185,129,.2); color:#6ee7b7; }
+.funding-card-title { font-size:1.25rem; font-weight:700; color:#fff; }
+.funding-card-body { color:#9e9688; line-height:1.7; margin-bottom:1.5rem; }
+.funding-card-items { display:flex; flex-direction:column; gap:.75rem; }
+.funding-item { display:flex; gap:.75rem; font-size:.9375rem; }
+.funding-item-icon { flex-shrink:0; font-size:.875rem; }
+.funding-item-text { color:#f0e8d8; line-height:1.5; }
+.funding-when { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; }
+.funding-when h4 { font-size:1.5rem; font-weight:600; color:#fff; margin-bottom:1.5rem; }
+.when-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+.when-card { padding:1.5rem; border-radius:8px; background:rgba(240,232,216,.05); }
+.when-label { font-size:1rem; font-weight:700; color:#fff; margin-bottom:1rem; }
+.when-items { display:flex; flex-direction:column; gap:.5rem; }
+.when-item { display:flex; gap:.75rem; font-size:.875rem; color:#9e9688; line-height:1.5; }
+.conversation-strategy { display:flex; flex-direction:column; gap:2.5rem; }
+.stakeholder-card { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; }
+.stakeholder-header { display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; color:#c8851a; font-size:1.5rem; }
+.stakeholder-header h4 { font-size:1.25rem; font-weight:600; color:#fff; }
+.stakeholder-priorities,.stakeholder-approach { margin-bottom:1rem; line-height:1.7; color:#9e9688; }
+.stakeholder-priorities strong,.stakeholder-approach strong { color:#e8c47a; }
+.objection-patterns { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; }
+.objection-patterns h4 { font-size:1.5rem; font-weight:600; color:#fff; margin-bottom:2rem; }
+.objection-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; }
+.objection-item { padding:1.5rem; background:rgba(240,232,216,.05); border-radius:8px; }
+.objection-text { font-size:1.0625rem; font-weight:600; color:#fff; margin-bottom:1rem; font-style:italic; }
+.response-strategy { color:#9e9688; line-height:1.7; }
+.response-strategy strong { color:#e8c47a; }
+.principles-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; }
+.principle-item { padding:1.5rem; background:rgba(240,232,216,.05); border-radius:8px; color:#9e9688; line-height:1.7; }
+.principle-item strong { color:#fff; display:block; margin-bottom:.5rem; }
+.demo-header { margin-bottom:1rem; }
+.demo-label { display:inline-block; padding:.375rem .875rem; background:rgba(200,133,26,.12); border:1px solid rgba(200,133,26,.3); border-radius:6px; font-size:.8125rem; font-weight:600; color:#e8c47a; }
+.calculator-inputs { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; margin-bottom:2rem; }
+.calculator-inputs h4 { font-size:1.25rem; font-weight:600; color:#fff; margin-bottom:1.5rem; }
+.input-section-label { font-size:.8125rem; font-weight:700; color:#e8c47a; text-transform:uppercase; letter-spacing:.05em; margin:1.5rem 0 1rem; }
+.input-section-label:first-child { margin-top:0; }
+.input-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.25rem; }
+.input-grid.two { grid-template-columns:repeat(2,1fr); }
+.input-grid.three { grid-template-columns:repeat(3,1fr); }
+.input-field { display:flex; flex-direction:column; gap:.5rem; }
+.input-field label { font-weight:600; color:#9e9688; font-size:.8125rem; }
+.calc-input { padding:.75rem 1rem; background:rgba(240,232,216,.05); border:1px solid rgba(240,232,216,.15); border-radius:6px; color:#f0e8d8; font-size:1rem; font-weight:600; }
+.calc-input:focus { outline:none; border-color:#c8851a; }
+.attachment-note { margin-top:1.5rem; padding:1rem 1.25rem; background:rgba(200,133,26,.08); border-radius:8px; color:#9e9688; line-height:1.6; }
+.attachment-note strong { color:#e8c47a; }
+.results-table { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; margin-bottom:2rem; }
+.results-table h4 { font-size:1.25rem; font-weight:600; color:#fff; margin-bottom:1.5rem; }
+.table-header,.table-row { display:grid; gap:1rem; padding:.75rem 1rem; border-radius:6px; }
+.table-header { background:rgba(200,133,26,.1); font-size:.8125rem; font-weight:700; color:#e8c47a; text-transform:uppercase; letter-spacing:.04em; margin-bottom:.5rem; }
+.table-row { background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.08); margin-bottom:.375rem; font-size:.9375rem; color:#f0e8d8; }
+.table-cell { display:flex; align-items:center; }
+.table-cell.savings { color:#10b981; font-weight:700; }
+.table-cell.negative { color:#ef4444; font-weight:700; }
+.savings-summary-card { padding:2.5rem; background:linear-gradient(135deg,rgba(200,133,26,.12),rgba(200,133,26,.05)); border:2px solid rgba(200,133,26,.3); border-radius:16px; display:flex; align-items:center; justify-content:space-between; gap:2rem; }
+.metric-value { font-size:3rem; font-weight:700; color:#c8851a; margin-bottom:.5rem; }
+.metric-label { color:#9e9688; font-size:1rem; }
+.summary-breakdown-mini { display:flex; flex-direction:column; gap:.75rem; }
+.breakdown-line { display:flex; justify-content:space-between; align-items:center; padding:.625rem 1rem; background:rgba(240,232,216,.05); border-radius:6px; color:#9e9688; gap:2rem; }
+.breakdown-line strong { color:#c8851a; font-size:1.125rem; }
+.three-way-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:2rem; }
+.option-card { padding:2rem; border-radius:12px; border:2px solid; position:relative; }
+.option-card.peo { background:rgba(239,68,68,.06); border-color:rgba(239,68,68,.25); }
+.option-card.fi { background:rgba(245,158,11,.06); border-color:rgba(245,158,11,.25); }
+.option-card.lf { background:rgba(16,185,129,.06); border-color:rgba(16,185,129,.25); }
+.option-tag { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.75rem; }
+.option-card.peo .option-tag { color:#fca5a5; }
+.option-card.fi .option-tag { color:#fbbf24; }
+.option-card.lf .option-tag { color:#6ee7b7; }
+.option-name { font-size:1.25rem; font-weight:700; color:#fff; margin-bottom:.5rem; }
+.option-pepm { font-size:2.5rem; font-weight:800; line-height:1; margin-bottom:.25rem; }
+.option-card.peo .option-pepm { color:#ef4444; }
+.option-card.fi .option-pepm { color:#f59e0b; }
+.option-card.lf .option-pepm { color:#10b981; }
+.option-pepm-label { font-size:.875rem; color:#9e9688; margin-bottom:1.25rem; }
+.option-annual { font-size:1.125rem; font-weight:600; color:#fff; margin-bottom:.25rem; }
+.option-annual-label { font-size:.8125rem; color:#9e9688; margin-bottom:1.25rem; }
+.option-vs-peo { padding:.625rem 1rem; border-radius:6px; font-size:.9375rem; font-weight:700; text-align:center; margin-bottom:1.25rem; }
+.option-vs-peo.savings { background:rgba(16,185,129,.15); color:#10b981; }
+.option-vs-peo.baseline { background:rgba(107,114,128,.15); color:#9ca3af; }
+.option-vs-peo.cost { background:rgba(239,68,68,.15); color:#ef4444; }
+.option-breakdown { display:flex; flex-direction:column; gap:.5rem; }
+.opt-bd-row { display:flex; justify-content:space-between; font-size:.875rem; padding:.375rem 0; border-bottom:1px solid rgba(240,232,216,.08); color:#9e9688; }
+.opt-bd-row:last-child { border-bottom:none; }
+.opt-bd-row span:last-child { color:#f0e8d8; font-weight:600; }
+.insight-box { padding:1.5rem 2rem; border-radius:12px; border:1px solid; }
+.insight-box.favorable { background:rgba(16,185,129,.08); border-color:rgba(16,185,129,.25); color:#6ee7b7; }
+.insight-box.caution { background:rgba(245,158,11,.08); border-color:rgba(245,158,11,.25); color:#fbbf24; }
+.insight-box.neutral { background:rgba(200,133,26,.08); border-color:rgba(200,133,26,.25); color:#e8c47a; }
+.insight-box strong { color:#fff; }
+.lf-projection { display:flex; flex-direction:column; gap:1.5rem; margin-bottom:2rem; }
+.lf-year { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; }
+.lf-year-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+.lf-year-title { font-size:1.125rem; font-weight:700; color:#fff; }
+.lf-year-savings { padding:.5rem 1.25rem; background:rgba(16,185,129,.15); border-radius:6px; font-size:1.0625rem; font-weight:700; color:#10b981; }
+.lf-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+.lf-metric { text-align:center; }
+.lf-metric-value { font-size:1.5rem; font-weight:700; color:#c8851a; }
+.lf-metric-label { font-size:.8125rem; color:#9e9688; margin-top:.25rem; }
+.lf-refund { padding:1rem 1.25rem; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.2); border-radius:8px; margin-top:1rem; font-size:.9375rem; color:#6ee7b7; }
+.lf-refund strong { color:#fff; }
+.roadmap-tabs { display:grid; grid-template-columns:repeat(5,1fr); gap:.875rem; margin-bottom:2rem; }
+.roadmap-tab { padding:1.5rem; background:rgba(240,232,216,.03); border:2px solid rgba(240,232,216,.1); border-radius:12px; cursor:pointer; transition:all .2s; text-align:left; }
+.roadmap-tab:hover { background:rgba(240,232,216,.05); }
+.roadmap-tab.active { background:rgba(200,133,26,.1); border-color:rgba(200,133,26,.4); }
+.tab-phase { font-size:.75rem; font-weight:700; color:#e8c47a; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.5rem; }
+.tab-title { font-size:1rem; font-weight:600; color:#fff; margin-bottom:.5rem; }
+.tab-duration { font-size:.8125rem; color:#9e9688; }
+.roadmap-detail { padding:2rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; margin-bottom:2rem; }
+.roadmap-detail-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:2rem; }
+.roadmap-detail-header h4 { font-size:1.5rem; font-weight:600; color:#fff; margin-bottom:.5rem; }
+.detail-duration { color:#9e9688; font-weight:600; }
+.phase-tag { padding:.375rem .875rem; background:rgba(200,133,26,.1); border:1px solid rgba(200,133,26,.3); border-radius:6px; font-size:.8125rem; font-weight:600; color:#e8c47a; }
+.activities-list { display:flex; flex-direction:column; gap:1rem; }
+.activity-row { display:flex; gap:1.25rem; padding:1.25rem; background:rgba(240,232,216,.05); border-radius:8px; }
+.activity-marker { flex-shrink:0; width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#c8851a,#a06010); border-radius:8px; font-weight:700; color:#fff; }
+.activity-content { flex:1; }
+.activity-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem; }
+.activity-name { font-weight:600; color:#fff; }
+.activity-owner { font-size:.8125rem; color:#e8c47a; padding:.25rem .75rem; background:rgba(200,133,26,.1); border-radius:4px; }
+.activity-detail { color:#9e9688; line-height:1.6; font-size:.9375rem; }
+.progress-bar-row { display:flex; align-items:center; gap:1rem; padding:1.5rem; background:rgba(240,232,216,.03); border:1px solid rgba(240,232,216,.1); border-radius:12px; }
+.progress-track { flex:1; display:flex; align-items:center; }
+.progress-node-wrap { display:flex; align-items:center; flex:1; }
+.progress-node-wrap:last-child { flex:0; }
+.progress-node { width:18px; height:18px; border-radius:50%; background:rgba(240,232,216,.15); flex-shrink:0; transition:all .3s; }
+.progress-node.active { background:linear-gradient(135deg,#c8851a,#a06010); box-shadow:0 0 0 4px rgba(200,133,26,.2); }
+.progress-node.final.active { background:linear-gradient(135deg,#10b981,#059669); box-shadow:0 0 0 4px rgba(16,185,129,.2); }
+.progress-line { flex:1; height:3px; background:rgba(240,232,216,.12); transition:all .3s; }
+.progress-line.active { background:linear-gradient(90deg,#c8851a,#a06010); }
+.progress-labels { display:flex; justify-content:space-between; color:#9e9688; font-size:.875rem; font-weight:600; margin-top:.75rem; }
+@media(max-width:1200px){
+  .why-grid,.overview-nav-cards,.toolkit-layout,.assets-layout,.qualification-interactive,.objection-grid,.principles-grid,.funding-cards,.when-grid,.three-way-grid { grid-template-columns:1fr; }
+  .toolkit-nav,.assets-nav { position:static; flex-direction:row; overflow-x:auto; }
+  .scoring-panel { position:static; }
+  .input-grid { grid-template-columns:repeat(2,1fr); }
+  .primer-flow { flex-direction:column; }
+  .primer-arrow { transform:rotate(90deg); justify-content:center; }
+  .overview-stats { flex-direction:column; gap:2rem; align-items:center; }
+  .roadmap-tabs { grid-template-columns:repeat(3,1fr); }
+  .lf-metrics { grid-template-columns:repeat(2,1fr); }
+  .savings-summary-card { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo } = React;
+function App() {
+  const [activeSection, setActiveSection] = useState('overview');
+  const [activeToolkitSub, setActiveToolkitSub] = useState('qualification');
+  const [activeAsset, setActiveAsset] = useState('audit');
+  const [qualification, setQualification] = useState({});
+  const [readiness, setReadiness] = useState({ financial:{}, operational:{}, leadership:{} });
+  const [auditInputs, setAuditInputs] = useState({ employees:28, peoAllInPepm:210, directAdminPepm:42, stopLossRate:10 });
+  const [compInputs, setCompInputs] = useState({ employees:28, expectedClaimsPepm:195, carrierLoad:22, stopLossRate:10, lfAdminPepm:42, hrisAdminPepm:42, peoAllInPepm:210 });
+  const [lfInputs, setLfInputs] = useState({ employees:28, claimsPepm:195, claimsTrend:6, fiPremiumTrend:10, stopLossRate:10, lfAdminPepm:42, carrierLoad:22 });
+  const [roadmapPhase, setRoadmapPhase] = useState(0);
+
+  const fmt = (n) => '$' + Math.round(Math.abs(n)).toLocaleString();
+  const fmtK = (n) => '$' + Math.round(Math.abs(n)/1000).toLocaleString() + 'K';
+  const fmtM = (n) => '$' + (Math.abs(n)/1000000).toFixed(2) + 'M';
+  const fmtPct = (n) => (Math.round(n*10)/10).toFixed(1) + '%';
+
+  // AUDIT CALC - savings come from replacing PEO admin overhead with cheaper HRIS+broker
+  const auditResults = useMemo(() => {
+    const { employees, peoAllInPepm, directAdminPepm, stopLossRate } = auditInputs;
+    const annualPeo = employees * peoAllInPepm * 12;
+    const peoBenefitsPepm = peoAllInPepm * 0.62;  // est. 62% of PEO PEPM is benefits
+    const peoAdminPepm = peoAllInPepm * 0.38;      // est. 38% is HR/payroll/compliance overhead
+    // LF: same coverage as PEO provides + stop-loss premium on top
+    const lfBenefitsPepm = peoBenefitsPepm * (1 + stopLossRate / 100);
+    const directTotalPepm = lfBenefitsPepm + directAdminPepm;
+    const directTotal = directTotalPepm * employees * 12;
+    const adminSavings = (peoAdminPepm - directAdminPepm) * employees * 12;
+    const benefitsCostIncrease = (lfBenefitsPepm - peoBenefitsPepm) * employees * 12;
+    const savings = adminSavings - benefitsCostIncrease;
+    const refundPotential = peoBenefitsPepm * 0.12 * employees * 12;
+    return { annualPeo, peoBenefitsPepm, peoAdminPepm, lfBenefitsPepm, directAdminPepm,
+             directTotal, directTotalPepm, savings, savingsPct: savings/annualPeo*100,
+             adminSavings, benefitsCostIncrease, refundPotential };
+  }, [auditInputs]);
+
+  // THREE-WAY COMP
+  const compResults = useMemo(() => {
+    const { employees, expectedClaimsPepm, carrierLoad, stopLossRate, lfAdminPepm, hrisAdminPepm, peoAllInPepm } = compInputs;
+    const peoAnnual = employees * peoAllInPepm * 12;
+    const fiPremiumPepm = expectedClaimsPepm / (1 - carrierLoad/100);
+    const fiTotalPepm = fiPremiumPepm + hrisAdminPepm;  // FI premium + HRIS/broker to replace PEO HR
+    const fiAnnual = employees * fiTotalPepm * 12;
+    const lfSL = expectedClaimsPepm * stopLossRate/100;
+    const lfPepm = expectedClaimsPepm + lfSL + lfAdminPepm;  // lfAdminPepm includes LF admin + HRIS
+    const lfAnnual = employees * lfPepm * 12;
+    const lfRefund = employees * expectedClaimsPepm * 0.12 * 12;
+    const fiCarrierMargin = fiPremiumPepm - expectedClaimsPepm;
+    return {
+      peo: { pepm:peoAllInPepm, annual:peoAnnual },
+      fi: { pepm:fiTotalPepm, premiumPepm:fiPremiumPepm, annual:fiAnnual, vsPeo:peoAnnual-fiAnnual, carrierMargin:fiCarrierMargin, hrisAdminPepm },
+      lf: { pepm:lfPepm, annual:lfAnnual, vsPeo:peoAnnual-lfAnnual, vsFi:fiAnnual-lfAnnual, refund:lfRefund, claimsPepm:expectedClaimsPepm, slPepm:lfSL, adminPepm:lfAdminPepm }
+    };
+  }, [compInputs]);
+
+  // LF MODEL
+  const lfResults = useMemo(() => {
+    const { employees, claimsPepm, claimsTrend, fiPremiumTrend, stopLossRate, lfAdminPepm, carrierLoad } = lfInputs;
+    const build = (prevClaims, prevFiPepm, first) => {
+      const c = first ? claimsPepm : prevClaims*(1+claimsTrend/100);
+      const fp = first ? claimsPepm/(1-carrierLoad/100) : prevFiPepm*(1+fiPremiumTrend/100);
+      const sl = c * stopLossRate/100;
+      const lf = c + sl + lfAdminPepm;
+      const fiA = employees*fp*12, lfA = employees*lf*12;
+      const refund = employees*c*0.12*12;
+      return { c, fp, lf, fiA, lfA, refund, savings:fiA-lfA, claimsFund:employees*c*12 };
+    };
+    const y1=build(claimsPepm,claimsPepm/(1-carrierLoad/100),true);
+    const y2=build(y1.c,y1.fp,false);
+    const y3=build(y2.c,y2.fp,false);
+    return { years:[y1,y2,y3], totalSavings:y1.savings+y2.savings+y3.savings, totalRefund:y1.refund+y2.refund+y3.refund };
+  }, [lfInputs]);
+
+  // ---- OVERVIEW ----
+  const renderOverview = () => (
+    <div className="overview-section">
+      <div className="hero-content">
+        <h1 className="hero-title">MSP Benefits<br/><span>Transition Infrastructure</span></h1>
+        <p className="hero-description">A complete advisor framework for guiding MSPs from PEO arrangements to a direct benefits strategy. Qualify the right clients, assess their readiness, model the financial case across three funding options, and run a structured transition. Built for the MSP growth stage.</p>
+      </div>
+      <div className="overview-stats">
+        <div className="stat-block"><div className="stat-number">$150+</div><div className="stat-label">average all-in PEO cost per employee per month</div></div>
+        <div className="stat-block"><div className="stat-number">52%</div><div className="stat-label">of MSPs cite hiring as their number-one business challenge</div></div>
+        <div className="stat-block"><div className="stat-number">20–35</div><div className="stat-label">employees is the inflection point where the PEO math inverts</div></div>
+      </div>
+      <div className="why-section">
+        <h2>Why the PEO Transition, and Why Now</h2>
+        <div className="why-grid">
+          <div className="why-card"><div className="why-icon">&#36;</div><h3>The PEO Cost Problem</h3><p>PEO arrangements bundle HR, payroll, compliance, and benefits into a single per-employee fee. At 10 employees, the bundle is worth it. At 25-35, the MSP is paying a significant premium for HR infrastructure it no longer needs bundled, while getting a plan it cannot customize for recruiting.</p></div>
+          <div className="why-card"><div className="why-icon">&#128101;</div><h3>The Talent Imperative</h3><p>MSPs are competing for credentialed engineers against Big Tech and national firms. A PEO master plan offers no competitive differentiation. A direct benefits strategy gives the MSP control over plan design, employer contribution tiers, and the ability to position benefits as a genuine recruiting asset.</p></div>
+          <div className="why-card"><div className="why-icon">&#128203;</div><h3>The Transparency Gap</h3><p>MSPs inside a PEO have no visibility into what their benefits actually cost by employee tier, utilization, or health risk. A direct arrangement delivers the data needed to make informed decisions, benchmark against peers, and justify the investment in benefits to the team.</p></div>
+        </div>
+      </div>
+      <div className="model-primer">
+        <h2>The Three-Stage Advisor Model</h2>
+        <div className="primer-flow">
+          <div className="primer-step"><div className="primer-label">&#127807; Plant the Seed (5-18 employees)</div><div className="primer-detail">Meet the owner early. Place or audit the PEO. Earn referral commissions while building the relationship. Make sure they know you when the inflection point arrives.</div></div>
+          <div className="primer-arrow">&#8594;</div>
+          <div className="primer-step"><div className="primer-label">&#128260; The Transition (20-35 employees)</div><div className="primer-detail">Run the cost audit. Build the three-way comparison. Show the PEO exit path. Execute the transition to direct group health with a clear 26-week roadmap.</div></div>
+          <div className="primer-arrow">&#8594;</div>
+          <div className="primer-step"><div className="primer-label">&#128200; Full Advisory (35+ employees)</div><div className="primer-detail">Annual strategy reviews, benchmark reporting, plan optimization, and positioning as the long-term benefits partner who has been there since the early days. This is where the referral flywheel starts.</div></div>
+        </div>
+      </div>
+      <div className="overview-nav-cards">
+        <div className="nav-card" onClick={() => { setActiveSection('toolkit'); setActiveToolkitSub('qualification'); }}>
+          <div className="nc-icon">&#9678;</div><h3>Advisor Toolkit</h3>
+          <p>PEO qualification scoring, readiness assessment, funding education guide, and MSP-specific conversation frameworks</p>
+          <span className="nav-card-link">Open Toolkit &#8594;</span>
+        </div>
+        <div className="nav-card" onClick={() => { setActiveSection('assets'); setActiveAsset('audit'); }}>
+          <div className="nc-icon">&#9636;</div><h3>Client-Facing Calculators</h3>
+          <p>PEO cost audit, three-way comparison (PEO vs. fully insured vs. level-funded), level-funded savings model, and transition roadmap</p>
+          <span className="nav-card-link">Open Calculators &#8594;</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ---- QUALIFICATION ----
+  const qualCriteria = [
+    { id:'q1', cat:'Financial', label:'25 or more total employees (W-2 headcount)' },
+    { id:'q2', cat:'Financial', label:'All-in PEO cost exceeds $4,000 per month' },
+    { id:'q3', cat:'Financial', label:'MRR has been stable or growing for 12+ months' },
+    { id:'q4', cat:'Financial', label:'No large pending workers comp or HR liability claims' },
+    { id:'q5', cat:'Financial', label:'Owner reviews financial statements monthly' },
+    { id:'q6', cat:'Operational', label:'Headcount is expected to stay stable or grow over 12 months' },
+    { id:'q7', cat:'Operational', label:'PSA platform in place with documented service processes' },
+    { id:'q8', cat:'Operational', label:'At least one person handles HR or admin responsibilities' },
+    { id:'q9', cat:'Operational', label:'Owner willing to implement a standalone HRIS tool' },
+    { id:'q10', cat:'Leadership', label:'Owner has expressed frustration with PEO cost or rigidity' },
+    { id:'q11', cat:'Leadership', label:'Owner plans to stay independent for 3 or more years' },
+    { id:'q12', cat:'Leadership', label:'Benefits have come up in at least one recent recruiting conversation' },
+    { id:'q13', cat:'Leadership', label:'Owner willing to dedicate 3-5 hours to the transition process' }
+  ];
+  const qualScore = Math.round(Object.values(qualification).filter(Boolean).length / qualCriteria.length * 100);
+  const qualChecked = Object.values(qualification).filter(Boolean).length;
+  const qualResult = qualScore >= 70 ? { cls:'high', level:'Strong Candidate', action:'Proceed to readiness assessment and cost audit. This MSP has the profile to support a successful PEO transition. Build the side-by-side cost comparison and set a specific timeline for the transition conversation.' }
+    : qualScore >= 45 ? { cls:'medium', level:'Develop the Relationship', action:'Not ready today, but worth cultivating. Focus on the PEO audit as a no-pressure entry point. Revisit qualification in 90 days or after a trigger event (hiring push, renewal, ownership conversation).' }
+    : { cls:'low', level:'Too Early', action:'Plant the seed and maintain contact. This MSP is better served by an audit and education approach at this stage. Revisit when headcount or cost pain increases.' };
+  const cats = [...new Set(qualCriteria.map(c => c.cat))];
+
+  const renderQualification = () => (
+    <div className="subsection-content">
+      <h3>PEO Transition Qualification</h3>
+      <p className="subsection-intro">Score the MSP prospect against thirteen criteria across three dimensions. The score determines the right next step: proceed to audit, develop the relationship, or plant and wait.</p>
+      <div className="qualification-interactive">
+        <div className="criteria-checklist">
+          {cats.map(cat => (
+            <div key={cat} className="criteria-category">
+              <div className="category-title">{cat}</div>
+              <div className="criteria-items">
+                {qualCriteria.filter(c => c.cat===cat).map(c => (
+                  <label key={c.id} className="criterion-checkbox">
+                    <input type="checkbox" checked={!!qualification[c.id]} onChange={e => setQualification({...qualification,[c.id]:e.target.checked})} />
+                    <div className="checkbox-custom"></div>
+                    <span className="criterion-label">{c.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="scoring-panel">
+          <div className="score-display">
+            <div className="score-number">{qualScore}</div>
+            <div className="score-label">Qualification Score</div>
+            <div className="score-fraction">{qualChecked} of {qualCriteria.length} criteria met</div>
+          </div>
+          <div className={'qualification-result ' + qualResult.cls}>
+            <div className="result-level">{qualResult.level}</div>
+            <div className="result-action">{qualResult.action}</div>
+          </div>
+          <div className="scoring-guide-compact">
+            <div className="guide-item high"><span className="guide-range">70-100</span><span className="guide-label">Strong Candidate</span></div>
+            <div className="guide-item medium"><span className="guide-range">45-69</span><span className="guide-label">Develop Relationship</span></div>
+            <div className="guide-item low"><span className="guide-range">0-44</span><span className="guide-label">Too Early</span></div>
+          </div>
+          <button className="reset-btn" onClick={() => setQualification({})}>Reset All Criteria</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ---- READINESS ----
+  const readinessDims = [
+    { key:'financial', label:'Financial Readiness', questions:[
+      { id:'f1', text:'Does the business maintain 60+ days of operating reserves or cash cushion?' },
+      { id:'f2', text:'Is MRR growth consistent and has the business not had revenue shocks in the last 12 months?' },
+      { id:'f3', text:'Can the business absorb a 45-60 day claims run-out period during the PEO exit transition?' },
+      { id:'f4', text:'Does the owner understand payroll costs at the per-employee level and review P&L monthly?' }
+    ]},
+    { key:'operational', label:'Operational Readiness', questions:[
+      { id:'o1', text:'Is there a designated person (owner, ops manager, or admin) who handles HR and benefits questions today?' },
+      { id:'o2', text:'Is the team on a PSA platform with documented onboarding, ticketing, and service delivery processes?' },
+      { id:'o3', text:'Would the owner consider a standalone HRIS tool (Rippling, Gusto, BambooHR) to replace the PEO HR function?' },
+      { id:'o4', text:'Are current benefits communications to employees reasonably clear? Do employees know what they have?' }
+    ]},
+    { key:'leadership', label:'Leadership Alignment', questions:[
+      { id:'l1', text:'Has the owner explicitly said the PEO costs too much or that they want more control over benefits?' },
+      { id:'l2', text:'Has the owner mentioned losing an employee who cited better benefits at a larger company or competitor?' },
+      { id:'l3', text:'Is the owner planning to stay independent and grow headcount, rather than sell or merge in the near term?' }
+    ]}
+  ];
+  const calcReadinessScore = (dim) => {
+    const qs = readinessDims.find(d=>d.key===dim).questions;
+    const vals = qs.map(q => ({ yes:3, partial:1.5, no:0 }[readiness[dim][q.id]] || 0));
+    const max = qs.length * 3;
+    return Math.round(vals.reduce((a,v)=>a+v,0)/max*100);
+  };
+  const overallReadiness = Math.round(readinessDims.reduce((s,d)=>s+calcReadinessScore(d.key),0)/3);
+  const readRec = overallReadiness >= 65 ? { cls:'high', text:<><strong>Operationally Ready:</strong> This MSP has the financial cushion, operational structure, and leadership alignment to support a well-managed PEO transition. Proceed to cost audit and build the comparison model.</> }
+    : overallReadiness >= 40 ? { cls:'medium', text:<><strong>Partially Ready:</strong> Some gaps exist that should be addressed before the transition. Identify the specific weak dimensions and create a short action plan to close them, typically 30-60 days.</> }
+    : { cls:'low', text:<><strong>Not Yet Ready:</strong> Significant readiness gaps need to be addressed before attempting a PEO exit. Focus on the highest-impact dimension and revisit the assessment in 90 days.</> };
+
+  const renderReadiness = () => (
+    <div className="subsection-content">
+      <h3>Transition Readiness Assessment</h3>
+      <p className="subsection-intro">Rate the MSP on three dimensions using yes, partial, or no. The assessment identifies gaps before the transition begins and surfaces areas where the advisor needs to provide additional support or preparation time.</p>
+      <div className="readiness-interactive">
+        {readinessDims.map(dim => (
+          <div key={dim.key} className="readiness-dimension">
+            <div className="dimension-header">
+              <h4>{dim.label}</h4>
+              <div className="dimension-score">{calcReadinessScore(dim.key)}%</div>
+            </div>
+            <div className="readiness-questions">
+              {dim.questions.map(q => (
+                <div key={q.id} className="readiness-question">
+                  <div className="question-text">{q.text}</div>
+                  <div className="question-options">
+                    {['yes','partial','no'].map(opt => (
+                      <button key={opt} className={'option-btn ' + (readiness[dim.key][q.id]===opt ? 'selected '+opt : '')} onClick={() => setReadiness({...readiness,[dim.key]:{...readiness[dim.key],[q.id]:opt}})}>
+                        {opt.charAt(0).toUpperCase()+opt.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="readiness-summary">
+        <div className="summary-score">
+          <div className="summary-number">{overallReadiness}</div>
+          <div className="summary-label">Overall Readiness Score</div>
+        </div>
+        <div className="summary-breakdown">
+          {readinessDims.map(d => (
+            <div key={d.key} className="breakdown-item">
+              <div className="breakdown-label">{d.label.split(' ')[0]}</div>
+              <div className="breakdown-bar"><div className="breakdown-fill" style={{width:calcReadinessScore(d.key)+'%'}}></div></div>
+              <div className="breakdown-value">{calcReadinessScore(d.key)}%</div>
+            </div>
+          ))}
+        </div>
+        <div className={'recommendation ' + readRec.cls}>{readRec.text}</div>
+      </div>
+    </div>
+  );
+
+  // ---- FUNDING EDUCATION ----
+  const renderEducation = () => (
+    <div className="subsection-content">
+      <h3>Funding Options Education Guide</h3>
+      <p className="subsection-intro">Use this to educate MSP owners on the three funding options before presenting the comparison. Most owners have never thought about how their benefits are funded. Starting with this framing makes the calculator conversation land significantly better.</p>
+      <div className="funding-education">
+        <div className="funding-cards">
+          <div className="funding-card peo">
+            <div className="funding-card-header"><div className="funding-badge">Current State</div></div>
+            <div className="funding-card-title">PEO Arrangement</div>
+            <div className="funding-card-body">The MSP pays a bundled per-employee fee that includes payroll processing, HR compliance, workers comp, and a group health plan. The PEO is the employer of record. Benefits are on the PEO's master plan and cannot be customized for the MSP's specific workforce or recruiting needs.</div>
+            <div className="funding-card-items">
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#fca5a5'}}>&#8226;</div><div className="funding-item-text">All-in PEPM typically $150-$250</div></div>
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#fca5a5'}}>&#8226;</div><div className="funding-item-text">No control over plan design or contribution strategy</div></div>
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#fca5a5'}}>&#8226;</div><div className="funding-item-text">HR/payroll/benefits bundled, hard to unbundle as you grow</div></div>
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#fca5a5'}}>&#8226;</div><div className="funding-item-text">Makes sense under 20 employees, overpays above 25</div></div>
+            </div>
+          </div>
+          <div className="funding-card fi">
+            <div className="funding-card-header"><div className="funding-badge">Direct</div></div>
+            <div className="funding-card-title">Fully Insured Group Health</div>
+            <div className="funding-card-body">The MSP buys a traditional group health plan directly from a carrier. A fixed premium is paid monthly regardless of actual claims. The carrier assumes all claims risk. Premium includes the carrier's profit margin, administrative load, and a risk charge on top of expected claims.</div>
+            <div className="funding-card-items">
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#fbbf24'}}>&#8226;</div><div className="funding-item-text">Predictable fixed monthly cost</div></div>
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#fbbf24'}}>&#8226;</div><div className="funding-item-text">Carrier keeps the savings in good claims years</div></div>
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#fbbf24'}}>&#8226;</div><div className="funding-item-text">Premium includes 20-25% carrier load above actual claims</div></div>
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#fbbf24'}}>&#8226;</div><div className="funding-item-text">Full plan design control and competitive differentiation</div></div>
+            </div>
+          </div>
+          <div className="funding-card lf">
+            <div className="funding-card-header"><div className="funding-badge">When Eligible</div></div>
+            <div className="funding-card-title">Level-Funded Plan</div>
+            <div className="funding-card-body">The MSP funds a fixed monthly amount covering expected claims, a stop-loss premium, and administrative fees. Stop-loss protects against any individual high-cost claim or an aggregate bad year. If actual claims come in under the funded amount, the MSP keeps the surplus as a refund. Availability and minimum group size vary significantly by carrier and state; most carriers offer level-funded products to groups of 10 or more, and California's ACA small-group market regulations affect eligibility for groups under 50. Always verify state-specific availability before presenting this option.</div>
+            <div className="funding-card-items">
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#6ee7b7'}}>&#8226;</div><div className="funding-item-text">Monthly cost is predictable like fully insured</div></div>
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#6ee7b7'}}>&#8226;</div><div className="funding-item-text">Refund potential in good claims years (MSP keeps savings)</div></div>
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#6ee7b7'}}>&#8226;</div><div className="funding-item-text">Specific stop-loss caps individual high claims; aggregate stop-loss limits total group exposure</div></div>
+              <div className="funding-item"><div className="funding-item-icon" style={{color:'#6ee7b7'}}>&#8226;</div><div className="funding-item-text">Claims data visibility for future plan optimization</div></div>
+            </div>
+          </div>
+        </div>
+        <div className="funding-when">
+          <h4>When Each Option Is the Right Call</h4>
+          <div className="when-grid">
+            <div className="when-card">
+              <div className="when-label" style={{color:'#fca5a5'}}>Stay in the PEO when...</div>
+              <div className="when-items">
+                <div className="when-item"><span style={{color:'#fca5a5'}}>&#8226;</span><span>Headcount is under 20 and expected to stay there</span></div>
+                <div className="when-item"><span style={{color:'#fca5a5'}}>&#8226;</span><span>Owner has no capacity to manage any HR function directly</span></div>
+                <div className="when-item"><span style={{color:'#fca5a5'}}>&#8226;</span><span>Business is in a period of significant instability or pending sale</span></div>
+                <div className="when-item"><span style={{color:'#fca5a5'}}>&#8226;</span><span>Workers comp risk is genuinely high and needs PEO pooling</span></div>
+              </div>
+            </div>
+            <div className="when-card">
+              <div className="when-label" style={{color:'#fbbf24'}}>Choose fully insured when...</div>
+              <div className="when-items">
+                <div className="when-item"><span style={{color:'#fbbf24'}}>&#8226;</span><span>20-25 employees and the group has complex health history</span></div>
+                <div className="when-item"><span style={{color:'#fbbf24'}}>&#8226;</span><span>Owner wants maximum cost predictability for budgeting</span></div>
+                <div className="when-item"><span style={{color:'#fbbf24'}}>&#8226;</span><span>Level-funded underwriting is difficult due to claims history</span></div>
+                <div className="when-item"><span style={{color:'#fbbf24'}}>&#8226;</span><span>Group has a high-risk individual that would inflate stop-loss</span></div>
+              </div>
+            </div>
+            <div className="when-card">
+              <div className="when-label" style={{color:'#6ee7b7'}}>Choose level-funded when...</div>
+              <div className="when-items">
+                <div className="when-item"><span style={{color:'#6ee7b7'}}>&#8226;</span><span>25-35 employees with a relatively healthy workforce</span></div>
+                <div className="when-item"><span style={{color:'#6ee7b7'}}>&#8226;</span><span>Owner wants to participate in good-year savings</span></div>
+                <div className="when-item"><span style={{color:'#6ee7b7'}}>&#8226;</span><span>No recent large individual claims to inflate stop-loss pricing</span></div>
+                <div className="when-item"><span style={{color:'#6ee7b7'}}>&#8226;</span><span>Owner has 3+ year time horizon and stable headcount growth</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ---- CONVERSATION ----
+  const renderConversation = () => (
+    <div className="subsection-content">
+      <h3>MSP Owner Conversation Framework</h3>
+      <p className="subsection-intro">MSP owners are technical founders with financial discipline. They buy on expertise and numbers, not on relationships alone. Every conversation should lead with their language: MRR, per-seat cost, and utilization.</p>
+      <div className="conversation-strategy">
+        <div className="stakeholder-card">
+          <div className="stakeholder-header">&#128187;<h4>The MSP Owner Persona</h4></div>
+          <div className="stakeholder-priorities"><strong>How they think:</strong> Former engineer or sysadmin who built the MSP by solving problems. Prices everything by the seat or device. Runs EOS or something adjacent. Metrics-oriented. Deeply skeptical of vendors who don't understand their business model.</div>
+          <div className="stakeholder-approach"><strong>How to approach:</strong> Come in with their numbers before they give them to you. Know what a 28-employee MSP at $200K MRR should be paying per employee for benefits. Speak in PEPM. Reference the per-seat pricing parallel. Ask about L2 and vCIO recruiting before benefits. Let the cost audit do the heavy lifting.</div>
+        </div>
+        <div className="stakeholder-card">
+          <div className="stakeholder-header">&#128172;<h4>The Opening Conversation</h4></div>
+          <div className="stakeholder-priorities"><strong>Step 1:</strong> "Do you know what your all-in cost per employee is through your PEO, including admin fees, not just the benefits line?" They almost never do. This creates immediate curiosity.</div>
+          <div className="stakeholder-approach"><strong>Step 2:</strong> "I specialize in MSPs specifically. I've worked with teams like yours in the 25-35 employee range and found that the PEO math changes significantly at your size. I'd like to run a 20-minute audit, no pitch, just the numbers."</div>
+          <div className="stakeholder-priorities"><strong>Step 3:</strong> Deliver the audit. Show the per-seat PEO cost vs. direct alternative. Reference the MSP 501 benchmark data if you have it. Frame it as what other MSPs at their stage are doing.</div>
+        </div>
+        <div className="objection-patterns">
+          <h4>Common Objections and Responses</h4>
+          <div className="objection-grid">
+            <div className="objection-item">
+              <div className="objection-text">"The PEO handles everything. I don't want to deal with HR."</div>
+              <div className="response-strategy"><strong>Response:</strong> Reframe the time cost. "Right now you're paying the PEO about $X per month to handle HR. At your size, a $40/month HRIS and a quarterly check-in with me handles the same thing. The question is whether the difference is worth what you're currently paying per seat for it."</div>
+            </div>
+            <div className="objection-item">
+              <div className="objection-text">"What if we have a bad claims year after we transition?"</div>
+              <div className="response-strategy"><strong>Response:</strong> Walk through level-funded stop-loss mechanics. "Stop-loss caps your exposure both on individual claims and in aggregate. The worst case under a level-funded plan is that you hit your aggregate and pay slightly more than your funded amount. We model that scenario before we commit to anything."</div>
+            </div>
+            <div className="objection-item">
+              <div className="objection-text">"We're probably going to sell in the next few years."</div>
+              <div className="response-strategy"><strong>Response:</strong> Flip the incentive. "A well-structured direct benefits program actually adds value at exit. Acquirers doing diligence on an MSP want to see that HR infrastructure is clean and independent of a PEO co-employment arrangement. This transition makes you more attractive, not less."</div>
+            </div>
+            <div className="objection-item">
+              <div className="objection-text">"I don't want to disrupt the team right before a big hiring push."</div>
+              <div className="response-strategy"><strong>Response:</strong> Use the hiring push as the trigger. "The best time to transition is before the hiring push, not after. Candidates at the L2 and vCIO level are asking about benefits in first-round interviews right now. Going into those conversations with a competitive direct plan is exactly what I help MSPs do."</div>
+            </div>
+          </div>
+        </div>
+        <div className="objection-patterns">
+          <h4>Fundamental Principles for This Buyer</h4>
+          <div className="principles-grid">
+            <div className="principle-item"><strong>Lead with their numbers, not yours</strong>Generic PEPM benchmarks are less effective than running their specific PEO cost through the audit. Personalized data earns trust faster than any industry statistic.</div>
+            <div className="principle-item"><strong>Speak per-seat, not annual totals</strong>MSPs think in monthly recurring costs per employee. "$210 per seat per month all-in" lands better than "$70,560 per year." Translate everything into their pricing language.</div>
+            <div className="principle-item"><strong>Reference the peer group</strong>MSP owners trust other MSP owners above all other sources. If you know what other similar firms are doing, say so specifically. "MSPs in the 25-35 employee range that I work with are typically on level-funded plans at $145-165 PEPM."</div>
+            <div className="principle-item"><strong>The audit is the door opener</strong>Never ask for the business before the audit. The audit itself is the value. The transition comes from the audit conversation, not from a separate pitch. Keep the entry ask as small as possible.</div>
+          </div>
+        </div>
+      </div>
+      <div className="nav-footer">
+        <span></span>
+        <button onClick={() => setActiveSection('assets')} className="nav-button">Open Calculators &#8594;</button>
+      </div>
+    </div>
+  );
+
+  // ---- PEO AUDIT CALCULATOR ----
+  const a = auditResults;
+  const renderAudit = () => (
+    <div className="asset-demo">
+      <div className="demo-header"><h3>PEO Cost Audit Tool</h3><div className="demo-label">Admin Unbundling Calculator</div></div>
+      <p className="demo-intro">The PEO bundles benefits, HR administration, payroll processing, and compliance into a single per-employee fee. The savings from exiting a PEO come primarily from replacing the admin overhead portion with cheaper standalone tools, not from getting cheaper health insurance. This tool isolates that story clearly.</p>
+      <div className="calculator-inputs">
+        <h4>Inputs</h4>
+        <div className="input-grid">
+          <div className="input-field"><label>Employees (W-2 headcount)</label><input type="number" className="calc-input" value={auditInputs.employees} onChange={e=>setAuditInputs({...auditInputs,employees:+e.target.value||1})} /></div>
+          <div className="input-field"><label>PEO All-In PEPM ($)</label><input type="number" className="calc-input" value={auditInputs.peoAllInPepm} onChange={e=>setAuditInputs({...auditInputs,peoAllInPepm:+e.target.value||0})} /></div>
+          <div className="input-field"><label>Direct Admin PEPM ($)<br/><span style={{fontSize:'.75rem',color:'#9e9688',fontWeight:400}}>HRIS + broker replacement</span></label><input type="number" className="calc-input" value={auditInputs.directAdminPepm} onChange={e=>setAuditInputs({...auditInputs,directAdminPepm:+e.target.value||0})} /></div>
+          <div className="input-field"><label>Stop-Loss Rate (%)<br/><span style={{fontSize:'.75rem',color:'#9e9688',fontWeight:400}}>Added to benefits for LF</span></label><input type="number" className="calc-input" value={auditInputs.stopLossRate} onChange={e=>setAuditInputs({...auditInputs,stopLossRate:+e.target.value||0})} /></div>
+        </div>
+        <div className="attachment-note"><strong>How to read this:</strong> The 62/38 split between benefits and admin is a market average estimate across major PEOs. The actual split varies by PEO and employer size; request an an itemized invoice to verify. The direct admin PEPM covers an HRIS platform (typically $15-20/ee/month) plus a broker service fee (typically $20-25/ee/month). Stop-loss is added to the benefits portion to reflect the cost of replacing PEO pool coverage with individual group stop-loss protection.</div>
+      </div>
+      <div className="results-table">
+        <h4>PEO Cost Breakdown vs. Direct Alternative</h4>
+        <div className="table-header" style={{gridTemplateColumns:'2.5fr 1fr 1fr'}}><div className="table-cell">Component</div><div className="table-cell">PEPM</div><div className="table-cell">Annual</div></div>
+
+        <div style={{padding:'.5rem 0 .25rem',fontSize:'.75rem',fontWeight:700,color:'#9e9688',textTransform:'uppercase',letterSpacing:'.06em'}}>Current PEO arrangement</div>
+        <div className="table-row" style={{gridTemplateColumns:'2.5fr 1fr 1fr'}}><div className="table-cell">Benefits coverage (~62% of PEPM)</div><div className="table-cell">{fmt(a.peoBenefitsPepm)}</div><div className="table-cell">{fmtK(a.peoBenefitsPepm*auditInputs.employees*12)}</div></div>
+        <div className="table-row" style={{gridTemplateColumns:'2.5fr 1fr 1fr'}}><div className="table-cell">HR / payroll / compliance overhead (~38%)</div><div className="table-cell">{fmt(a.peoAdminPepm)}</div><div className="table-cell">{fmtK(a.peoAdminPepm*auditInputs.employees*12)}</div></div>
+        <div className="table-row" style={{gridTemplateColumns:'2.5fr 1fr 1fr',borderColor:'rgba(200,133,26,.3)'}}><div className="table-cell" style={{fontWeight:700,color:'#f0e8d8'}}>Total PEO cost</div><div className="table-cell" style={{fontWeight:700}}>{fmt(auditInputs.peoAllInPepm)}</div><div className="table-cell" style={{fontWeight:700}}>{fmtK(a.annualPeo)}</div></div>
+
+        <div style={{height:'1rem'}}></div>
+        <div style={{padding:'.5rem 0 .25rem',fontSize:'.75rem',fontWeight:700,color:'#9e9688',textTransform:'uppercase',letterSpacing:'.06em'}}>Direct replacement (level-funded)</div>
+        <div className="table-row" style={{gridTemplateColumns:'2.5fr 1fr 1fr',background:'rgba(16,185,129,.04)',borderColor:'rgba(16,185,129,.15)'}}><div className="table-cell">LF benefits coverage (same + {auditInputs.stopLossRate}% stop-loss)</div><div className="table-cell">{fmt(a.lfBenefitsPepm)}</div><div className="table-cell">{fmtK(a.lfBenefitsPepm*auditInputs.employees*12)}</div></div>
+        <div className="table-row" style={{gridTemplateColumns:'2.5fr 1fr 1fr',background:'rgba(16,185,129,.04)',borderColor:'rgba(16,185,129,.15)'}}><div className="table-cell">HRIS + broker admin (replaces PEO HR overhead)</div><div className="table-cell">{fmt(a.directAdminPepm)}</div><div className="table-cell">{fmtK(a.directAdminPepm*auditInputs.employees*12)}</div></div>
+        <div className="table-row" style={{gridTemplateColumns:'2.5fr 1fr 1fr',background:'rgba(16,185,129,.08)',borderColor:'rgba(16,185,129,.3)'}}><div className="table-cell" style={{fontWeight:700,color:'#6ee7b7'}}>Total direct cost</div><div className="table-cell" style={{fontWeight:700,color:'#6ee7b7'}}>{fmt(a.directTotalPepm)}</div><div className="table-cell" style={{fontWeight:700,color:'#6ee7b7'}}>{fmtK(a.directTotal)}</div></div>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'1rem',marginBottom:'2rem'}}>
+        <div style={{padding:'1.25rem',background:'rgba(16,185,129,.08)',border:'1px solid rgba(16,185,129,.25)',borderRadius:'10px',textAlign:'center'}}>
+          <div style={{fontSize:'.875rem',color:'#9e9688',marginBottom:'.5rem'}}>Admin overhead savings</div>
+          <div style={{fontSize:'1.75rem',fontWeight:700,color:'#10b981'}}>{fmtK(a.adminSavings)}/yr</div>
+          <div style={{fontSize:'.8125rem',color:'#9e9688',marginTop:'.375rem'}}>Replacing {fmt(a.peoAdminPepm)} PEPM with {fmt(a.directAdminPepm)} PEPM</div>
+        </div>
+        <div style={{padding:'1.25rem',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.2)',borderRadius:'10px',textAlign:'center'}}>
+          <div style={{fontSize:'.875rem',color:'#9e9688',marginBottom:'.5rem'}}>Benefits cost change</div>
+          <div style={{fontSize:'1.75rem',fontWeight:700,color:'#f59e0b'}}>+{fmtK(a.benefitsCostIncrease)}/yr</div>
+          <div style={{fontSize:'.8125rem',color:'#9e9688',marginTop:'.375rem'}}>Stop-loss premium on top of same coverage</div>
+        </div>
+        <div style={{padding:'1.25rem',background:'rgba(200,133,26,.1)',border:'1px solid rgba(200,133,26,.3)',borderRadius:'10px',textAlign:'center'}}>
+          <div style={{fontSize:'.875rem',color:'#9e9688',marginBottom:'.5rem'}}>Net annual savings</div>
+          <div style={{fontSize:'1.75rem',fontWeight:700,color:'#c8851a'}}>{a.savings >= 0 ? fmtK(a.savings) : '('+fmtK(Math.abs(a.savings))+')'}</div>
+          <div style={{fontSize:'.8125rem',color:'#9e9688',marginTop:'.375rem'}}>Admin savings minus stop-loss addition</div>
+        </div>
+      </div>
+
+      <div className="savings-summary-card">
+        <div>
+          <div className="metric-value">{a.savings >= 0 ? fmtK(a.savings) : '('+fmtK(Math.abs(a.savings))+')'}</div>
+          <div className="metric-label">{a.savings >= 0 ? 'Estimated net annual savings from PEO exit' : 'Stop-loss cost exceeds admin savings at current inputs'}</div>
+        </div>
+        <div className="summary-breakdown-mini">
+          <div className="breakdown-line"><span>Admin savings per employee per month</span><strong style={{color:'#10b981'}}>{fmt(a.peoAdminPepm - a.directAdminPepm)}</strong></div>
+          <div className="breakdown-line"><span>Good-year LF refund potential</span><strong style={{color:'#10b981'}}>+{fmtK(a.refundPotential)}/yr</strong></div>
+          <div className="breakdown-line"><span>Best-case total benefit</span><strong style={{color:'#c8851a'}}>{fmtK(a.savings + a.refundPotential)}/yr</strong></div>
+        </div>
+      </div>
+      <div className="insight-box neutral" style={{marginTop:'1.5rem'}}><strong>Important context:</strong> PEOs negotiate group health rates across their entire book of tens of thousands of employees, giving small groups access to better rates than they could get alone. The direct benefits cost may be slightly higher than the PEO's benefits portion, which is why the savings story here focuses on admin overhead reduction, not insurance cost. The LF refund potential in good claims years is the additional financial upside beyond admin savings.</div>
+    </div>
+  );
+
+  // ---- THREE-WAY COMPARISON ----
+  const c = compResults;
+  const renderComparison = () => (
+    <div className="asset-demo">
+      <div className="demo-header"><h3>Three-Way Comparison</h3><div className="demo-label">PEO vs. Fully Insured vs. Level-Funded</div></div>
+      <p className="demo-intro">Adjust inputs to show the MSP owner a side-by-side cost comparison across all three funding options. Use this live in the conversation after the PEO audit to frame the level-funded discussion.</p>
+      <div className="calculator-inputs">
+        <h4>Inputs</h4>
+        <div className="input-grid">
+          <div className="input-field"><label>Employees</label><input type="number" className="calc-input" value={compInputs.employees} onChange={e=>setCompInputs({...compInputs,employees:+e.target.value||1})} /></div>
+          <div className="input-field"><label>PEO All-In PEPM ($)</label><input type="number" className="calc-input" value={compInputs.peoAllInPepm} onChange={e=>setCompInputs({...compInputs,peoAllInPepm:+e.target.value||0})} /></div>
+          <div className="input-field"><label>Expected Claims PEPM ($)</label><input type="number" className="calc-input" value={compInputs.expectedClaimsPepm} onChange={e=>setCompInputs({...compInputs,expectedClaimsPepm:+e.target.value||0})} /></div>
+          <div className="input-field"><label>Carrier Load % (FI)</label><input type="number" className="calc-input" value={compInputs.carrierLoad} onChange={e=>setCompInputs({...compInputs,carrierLoad:+e.target.value||0})} /></div>
+          <div className="input-field"><label>Stop-Loss Rate % (LF)</label><input type="number" className="calc-input" value={compInputs.stopLossRate} onChange={e=>setCompInputs({...compInputs,stopLossRate:+e.target.value||0})} /></div>
+          <div className="input-field"><label>LF Admin PEPM ($)<br/><span style={{fontSize:'.75rem',color:'#9e9688',fontWeight:400}}>LF plan admin fee</span></label><input type="number" className="calc-input" value={compInputs.lfAdminPepm} onChange={e=>setCompInputs({...compInputs,lfAdminPepm:+e.target.value||0})} /></div>
+          <div className="input-field"><label>HRIS + Broker PEPM ($)<br/><span style={{fontSize:'.75rem',color:'#9e9688',fontWeight:400}}>Added to FI and LF totals</span></label><input type="number" className="calc-input" value={compInputs.hrisAdminPepm} onChange={e=>setCompInputs({...compInputs,hrisAdminPepm:+e.target.value||0})} /></div>
+        </div>
+        <div className="attachment-note"><strong>Expected claims PEPM</strong> is the actuarial expected medical + Rx cost per enrolled employee per month for this specific group. For a younger IT workforce with mostly employee-only coverage, $180-220 is a reasonable starting estimate. <strong>HRIS + broker PEPM</strong> is added to both the FI and LF totals to reflect the standalone HR admin cost that replaces the PEO bundle, making all three options a true apples-to-apples total cost comparison.</div>
+      </div>
+      <div className="three-way-grid">
+        <div className="option-card peo">
+          <div className="option-tag">Current State</div>
+          <div className="option-name">PEO Arrangement</div>
+          <div className="option-pepm">{fmt(c.peo.pepm)}</div>
+          <div className="option-pepm-label">per employee per month</div>
+          <div className="option-annual">{fmtK(c.peo.annual)}</div>
+          <div className="option-annual-label">estimated annual cost</div>
+          <div className="option-vs-peo baseline">Baseline: current spend</div>
+          <div className="option-breakdown">
+            <div className="opt-bd-row"><span>Benefits (~62%)</span><span>{fmt(c.peo.pepm*0.62)} PEPM</span></div>
+            <div className="opt-bd-row"><span>HR / Admin / Payroll (~38%)</span><span>{fmt(c.peo.pepm*0.38)} PEPM</span></div>
+            <div className="opt-bd-row"><span>Plan design control</span><span>None</span></div>
+            <div className="opt-bd-row"><span>Savings in good years</span><span>None</span></div>
+          </div>
+        </div>
+        <div className="option-card fi">
+          <div className="option-tag">Direct Option</div>
+          <div className="option-name">Fully Insured Group Health</div>
+          <div className="option-pepm">{fmt(c.fi.pepm)}</div>
+          <div className="option-pepm-label">total per employee per month (incl. HRIS)</div>
+          <div className="option-annual">{fmtK(c.fi.annual)}</div>
+          <div className="option-annual-label">estimated all-in annual cost</div>
+          <div className={'option-vs-peo ' + (c.fi.vsPeo > 0 ? 'savings' : 'cost')}>{c.fi.vsPeo > 0 ? 'Saves '+fmtK(c.fi.vsPeo)+'/yr vs. PEO' : 'Costs '+fmtK(Math.abs(c.fi.vsPeo))+'/yr more than PEO'}</div>
+          <div className="option-breakdown">
+            <div className="opt-bd-row"><span>FI premium (claims + carrier margin)</span><span>{fmt(c.fi.premiumPepm)} PEPM</span></div>
+            <div className="opt-bd-row"><span>Carrier margin (profit + risk + admin)</span><span>~{fmt(c.fi.carrierMargin)} PEPM</span></div>
+            <div className="opt-bd-row"><span>HRIS + broker admin</span><span>{fmt(c.fi.hrisAdminPepm)} PEPM</span></div>
+            <div className="opt-bd-row"><span>Plan design control</span><span>Full</span></div>
+            <div className="opt-bd-row"><span>Savings in good years</span><span>Carrier keeps</span></div>
+          </div>
+        </div>
+        <div className="option-card lf">
+          <div className="option-tag">Level-Funded</div>
+          <div className="option-name">Level-Funded Plan</div>
+          <div className="option-pepm">{fmt(c.lf.pepm)}</div>
+          <div className="option-pepm-label">total per employee per month (incl. HRIS)</div>
+          <div className="option-annual">{fmtK(c.lf.annual)}</div>
+          <div className="option-annual-label">estimated all-in annual funded amount</div>
+          <div className={'option-vs-peo ' + (c.lf.vsPeo > 0 ? 'savings' : 'cost')}>{c.lf.vsPeo > 0 ? 'Saves '+fmtK(c.lf.vsPeo)+'/yr vs. PEO' : 'Costs '+fmtK(Math.abs(c.lf.vsPeo))+'/yr more than PEO'}</div>
+          <div className="option-breakdown">
+            <div className="opt-bd-row"><span>Claims fund</span><span>{fmt(c.lf.claimsPepm)} PEPM</span></div>
+            <div className="opt-bd-row"><span>Stop-loss premium</span><span>{fmt(c.lf.slPepm)} PEPM</span></div>
+            <div className="opt-bd-row"><span>LF plan admin + HRIS</span><span>{fmt(c.lf.adminPepm)} PEPM</span></div>
+            <div className="opt-bd-row"><span>Good-year refund scenario</span><span style={{color:'#10b981'}}>~{fmtK(c.lf.refund)}</span></div>
+          </div>
+        </div>
+      </div>
+      {c.lf.vsFi > 0 && <div className="insight-box favorable" style={{marginBottom:'1rem'}}><strong>Level-funded is {fmtK(c.lf.vsFi)}/year cheaper than fully insured</strong> at current inputs before any refund. In a favorable claims year (actual claims ~12% below funded), the MSP could also recover ~{fmtK(c.lf.refund)}, but this is a scenario, not a guarantee.</div>}
+      {c.lf.vsFi <= 0 && <div className="insight-box caution" style={{marginBottom:'1rem'}}><strong>Fully insured is more cost-effective than level-funded at current inputs.</strong> This can happen when the stop-loss premium + LF admin exceeds the carrier load savings. Adjust the claims estimate, stop-loss rate, or carrier load to model different scenarios.</div>}
+      <div className="insight-box neutral" style={{marginBottom:'1rem'}}><strong>Why the PEO sometimes shows lower total cost:</strong> PEOs negotiate health insurance rates across their entire book of tens of thousands of employees, giving them pool purchasing power that individual small groups cannot replicate. The value of going direct is plan design control, claims data visibility, and LF refund potential, not necessarily a lower headline cost at the 25-35 employee range.</div>
+    </div>
+  );
+
+  // ---- LEVEL-FUNDED MODEL ----
+  const lf = lfResults;
+  const renderLFModel = () => (
+    <div className="asset-demo">
+      <div className="demo-header"><h3>Level-Funded Savings Model</h3><div className="demo-label">3-Year Projection vs. Fully Insured</div></div>
+      <p className="demo-intro">Projects three years of level-funded vs. fully insured cost side by side, with a good-year refund estimate in each year. Use this to show the MSP owner the compounding advantage of level-funding over a full contract period.</p>
+      <div className="calculator-inputs">
+        <h4>Inputs</h4>
+        <div className="input-grid">
+          <div className="input-field"><label>Employees</label><input type="number" className="calc-input" value={lfInputs.employees} onChange={e=>setLfInputs({...lfInputs,employees:+e.target.value||1})} /></div>
+          <div className="input-field"><label>Expected Claims PEPM ($)</label><input type="number" className="calc-input" value={lfInputs.claimsPepm} onChange={e=>setLfInputs({...lfInputs,claimsPepm:+e.target.value||0})} /></div>
+          <div className="input-field"><label>Claims Trend (%/yr)</label><input type="number" className="calc-input" value={lfInputs.claimsTrend} onChange={e=>setLfInputs({...lfInputs,claimsTrend:+e.target.value||0})} /></div>
+          <div className="input-field"><label>FI Premium Trend (%/yr)</label><input type="number" className="calc-input" value={lfInputs.fiPremiumTrend} onChange={e=>setLfInputs({...lfInputs,fiPremiumTrend:+e.target.value||0})} /></div>
+          <div className="input-field"><label>Stop-Loss Rate (%)</label><input type="number" className="calc-input" value={lfInputs.stopLossRate} onChange={e=>setLfInputs({...lfInputs,stopLossRate:+e.target.value||0})} /></div>
+          <div className="input-field"><label>LF Admin PEPM ($)</label><input type="number" className="calc-input" value={lfInputs.lfAdminPepm} onChange={e=>setLfInputs({...lfInputs,lfAdminPepm:+e.target.value||0})} /></div>
+          <div className="input-field"><label>FI Carrier Load (%)</label><input type="number" className="calc-input" value={lfInputs.carrierLoad} onChange={e=>setLfInputs({...lfInputs,carrierLoad:+e.target.value||0})} /></div>
+        </div>
+        <div className="attachment-note">FI premium trend is typically higher than claims trend because carriers apply a profit load on top of expected claims growth. The good-year refund uses a 12% assumption, meaning actual claims came in 12% under the funded amount. This is an illustrative scenario; actual refunds depend entirely on the group's claims experience.</div>
+      </div>
+      <div className="lf-projection">
+        {lf.years.map((y,i) => (
+          <div key={i} className="lf-year">
+            <div className="lf-year-header">
+              <div className="lf-year-title">Year {i+1}</div>
+              <div className="lf-year-savings">Saves {fmtK(y.savings)} vs. Fully Insured</div>
+            </div>
+            <div className="lf-metrics">
+              <div className="lf-metric"><div className="lf-metric-value">{fmt(y.fp)}</div><div className="lf-metric-label">FI premium PEPM</div></div>
+              <div className="lf-metric"><div className="lf-metric-value" style={{color:'#10b981'}}>{fmt(y.lf)}</div><div className="lf-metric-label">LF funded PEPM</div></div>
+              <div className="lf-metric"><div className="lf-metric-value">{fmtK(y.fiA)}</div><div className="lf-metric-label">FI annual cost</div></div>
+              <div className="lf-metric"><div className="lf-metric-value" style={{color:'#10b981'}}>{fmtK(y.lfA)}</div><div className="lf-metric-label">LF annual cost</div></div>
+            </div>
+            <div className="lf-refund"><strong>Good-year scenario (Year {i+1}):</strong> If actual claims come in ~12% below the funded amount, the MSP could recover approximately {fmtK(y.refund)}. This is a scenario illustration based on a favorable claims year, not a projected or guaranteed outcome.</div>
+          </div>
+        ))}
+      </div>
+      <div className="savings-summary-card">
+        <div><div className="metric-value">{fmtK(lf.totalSavings)}</div><div className="metric-label">Total 3-Year Savings vs. Fully Insured</div></div>
+        <div className="summary-breakdown-mini">
+          <div className="breakdown-line"><span>Average annual savings</span><strong>{fmtK(lf.totalSavings/3)}</strong></div>
+          <div className="breakdown-line"><span>Good-year refund potential (3 yrs)</span><strong style={{color:'#10b981'}}>{fmtK(lf.totalRefund)}</strong></div>
+          <div className="breakdown-line"><span>Best-case 3-yr effective savings</span><strong style={{color:'#10b981'}}>{fmtK(lf.totalSavings + lf.totalRefund)}</strong></div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ---- ROADMAP ----
+  const roadmapPhases = [
+    { title:'PEO Audit', duration:'Weeks 1-4', tag:'Advisor-led', activities:[
+      { name:'Pull PEO invoice and itemize all costs', owner:'Advisor', detail:'Request the most recent PEO invoice. Break out benefits premium, HR admin fees, payroll processing, workers comp, and any other line items.' },
+      { name:'Run the three-way cost comparison', owner:'Advisor', detail:'Build the PEO vs. fully insured vs. level-funded side-by-side using the comparison calculator. Present to the owner with per-seat framing.' },
+      { name:'Collect census and health history', owner:'MSP + Advisor', detail:'Pull employee census (ages, dependents, zip codes) and any available claims history or health questionnaires for underwriting purposes.' },
+      { name:'Owner decision: proceed to carriers', owner:'MSP Owner', detail:'The owner reviews the cost comparison and gives a go/no-go on beginning the carrier quoting process.' }
+    ]},
+    { title:'Carrier Quoting', duration:'Weeks 5-9', tag:'Advisor-led', activities:[
+      { name:'Submit census to level-funded carriers', owner:'Advisor', detail:'Submit the employee census and health data to 2-3 level-funded carriers and 1-2 fully insured carriers for competitive quoting.' },
+      { name:'Review and compare carrier proposals', owner:'Advisor', detail:'Analyze all quotes on plan design, network, premium, stop-loss terms, and refund provisions. Prepare a clean comparison document.' },
+      { name:'Select carrier and plan design', owner:'MSP Owner + Advisor', detail:'Owner selects the carrier and primary plan design. Confirm contribution strategy (employee-only, family, dependents).' },
+      { name:'Issue stop-loss contract and group application', owner:'Advisor', detail:'Complete all carrier applications, stop-loss applications, and group health applications. Collect signatures and submit.' }
+    ]},
+    { title:'HR Infrastructure', duration:'Weeks 10-15', tag:'Owner + Advisor', activities:[
+      { name:'Select and configure HRIS platform', owner:'MSP Owner', detail:'Choose a standalone HRIS (Rippling, Gusto, or BambooHR). Migrate employee data from the PEO. Configure payroll, PTO, and onboarding workflows.' },
+      { name:'Set up standalone payroll', owner:'MSP Owner', detail:'Transition payroll processing off the PEO and onto the new HRIS or standalone payroll provider. Confirm tax IDs and state registrations.' },
+      { name:'Notify PEO of exit intent', owner:'MSP Owner', detail:'Issue written notice of PEO exit per the contract terms. Most PEOs require 30-60 days written notice. Confirm the effective termination date.' },
+      { name:'Transfer workers comp and other coverages', owner:'Advisor', detail:'Place standalone workers comp and any other coverages that were bundled inside the PEO arrangement.' }
+    ]},
+    { title:'Open Enrollment', duration:'Weeks 16-21', tag:'Advisor + MSP', activities:[
+      { name:'Prepare employee benefits guide', owner:'Advisor', detail:'Create a clear, plain-language benefits summary document that explains the new plan, costs, networks, and effective date. Brand it to the MSP.' },
+      { name:'Hold all-hands benefits meeting', owner:'Advisor + MSP Owner', detail:'Advisor presents the new benefits to the team directly. Address questions live. Emphasize improvements: plan design, employer contribution, and any plan enhancements vs. the PEO plan.' },
+      { name:'Collect enrollment elections', owner:'Advisor', detail:'Manage the enrollment process. Collect all employee elections, dependent information, and beneficiary designations within the enrollment window.' },
+      { name:'Submit enrollment to carrier', owner:'Advisor', detail:'Confirm enrollment data with the carrier, verify effective dates, and request member ID cards for all enrolled employees and dependents.' }
+    ]},
+    { title:'PEO Exit and Go-Live', duration:'Weeks 22-26', tag:'Final Execution', activities:[
+      { name:'Confirm PEO termination date', owner:'MSP Owner', detail:'Verify the effective PEO exit date in writing. Confirm claims run-out provisions and any COBRA obligations under the PEO master plan.' },
+      { name:'New plan effective date confirmed', owner:'Advisor', detail:'Confirm new group health plan effective date with the carrier. Verify first invoice and payment method. Confirm employee ID cards are issued.' },
+      { name:'Distribute new member ID cards', owner:'Advisor', detail:'Ensure all enrolled employees have received their new carrier ID cards before the effective date so there is no gap in coverage access.' },
+      { name:'30-day and 90-day check-in', owner:'Advisor', detail:'Schedule a 30-day check-in to address any claims or admin issues. Schedule a 90-day review to confirm everything is running cleanly before the first renewal cycle.' }
+    ]}
+  ];
+  const rp = roadmapPhases[roadmapPhase];
+  const renderRoadmap = () => (
+    <div className="asset-demo">
+      <div className="demo-header"><h3>PEO Exit Roadmap</h3><div className="demo-label">26-Week Transition Plan</div></div>
+      <p className="demo-intro">A structured week-by-week plan from the PEO audit decision to go-live on the new direct plan. Click any phase to see detailed activities, owners, and deliverables. Use this to set expectations with the MSP owner on timeline and effort before starting the transition.</p>
+      <div className="roadmap-tabs">
+        {roadmapPhases.map((p,i) => (
+          <button key={i} className={'roadmap-tab '+(roadmapPhase===i?'active':'')} onClick={()=>setRoadmapPhase(i)}>
+            <div className="tab-phase">Phase {i+1}</div><div className="tab-title">{p.title}</div><div className="tab-duration">{p.duration}</div>
+          </button>
+        ))}
+      </div>
+      <div className="roadmap-detail">
+        <div className="roadmap-detail-header"><div><h4>{rp.title}</h4><div className="detail-duration">{rp.duration}</div></div><div className="phase-tag">{rp.tag}</div></div>
+        <div className="activities-list">
+          {rp.activities.map((act,i) => (
+            <div key={i} className="activity-row">
+              <div className="activity-marker">{i+1}</div>
+              <div className="activity-content">
+                <div className="activity-head"><div className="activity-name">{act.name}</div><div className="activity-owner">{act.owner}</div></div>
+                <div className="activity-detail">{act.detail}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="progress-bar-row">
+        <div className="progress-track">
+          {roadmapPhases.map((p,i) => (
+            <div key={i} className="progress-node-wrap">
+              <div className={'progress-node '+(i<=roadmapPhase?'active ':'')+( i===roadmapPhases.length-1?'final':'')}></div>
+              {i < roadmapPhases.length-1 && <div className={'progress-line '+(i<roadmapPhase?'active':'')}></div>}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="progress-labels"><span>Audit Decision</span><span>Go-Live at Week 26</span></div>
+    </div>
+  );
+
+  // ---- TOOLKIT / ASSETS SHELLS ----
+  const toolkitSections = [
+    { id:'qualification', label:'PEO Qualification' },
+    { id:'readiness', label:'Readiness Assessment' },
+    { id:'education', label:'Funding Education' },
+    { id:'conversation', label:'Conversation Framework' }
+  ];
+  const renderToolkit = () => {
+    const content = { qualification:renderQualification, readiness:renderReadiness, education:renderEducation, conversation:renderConversation };
+    return (
+      <div className="toolkit-section">
+        <div className="section-header"><h2 className="section-title">Advisor Toolkit</h2><p className="section-intro">Qualify, assess, educate, and engage MSP prospects through the full PEO transition process</p></div>
+        <div className="toolkit-layout">
+          <div className="toolkit-nav">{toolkitSections.map(s => (<button key={s.id} onClick={()=>setActiveToolkitSub(s.id)} className={'toolkit-nav-item '+(activeToolkitSub===s.id?'active':'')}>{s.label}</button>))}</div>
+          <div className="toolkit-content">{content[activeToolkitSub]()}</div>
+        </div>
+        <div className="nav-footer">
+          <button onClick={()=>setActiveSection('overview')} className="nav-button secondary">&#8592; Overview</button>
+          <button onClick={()=>setActiveSection('assets')} className="nav-button">Calculators &#8594;</button>
+        </div>
+      </div>
+    );
+  };
+
+  const assetList = [
+    { id:'audit', label:'PEO Cost Audit', type:'calculator' },
+    { id:'comparison', label:'Three-Way Comparison', type:'calculator' },
+    { id:'lfmodel', label:'Level-Funded Savings Model', type:'projection' },
+    { id:'roadmap', label:'Transition Roadmap', type:'timeline' }
+  ];
+  const renderAssets = () => {
+    const content = { audit:renderAudit, comparison:renderComparison, lfmodel:renderLFModel, roadmap:renderRoadmap };
+    return (
+      <div className="assets-section">
+        <div className="section-header"><h2 className="section-title">Client-Facing Calculators</h2><p className="section-intro">Interactive tools to use live during the MSP owner conversation and transition planning</p></div>
+        <div className="assets-layout">
+          <div className="assets-nav">{assetList.map(a => (<button key={a.id} onClick={()=>setActiveAsset(a.id)} className={'asset-nav-item '+(activeAsset===a.id?'active':'')}><div className="asset-type">{a.type}</div><span>{a.label}</span></button>))}</div>
+          <div className="assets-content">{(content[activeAsset] || renderAudit)()}</div>
+        </div>
+        <div className="nav-footer">
+          <button onClick={()=>setActiveSection('toolkit')} className="nav-button secondary">&#8592; Toolkit</button>
+          <button onClick={()=>setActiveSection('overview')} className="nav-button secondary">Overview</button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderContent = () => activeSection==='overview' ? renderOverview() : activeSection==='toolkit' ? renderToolkit() : renderAssets();
+
+  return (
+    <div className="app">
+      <nav className="main-nav">
+        <div className="nav-links">
+          <button onClick={()=>setActiveSection('overview')} className={activeSection==='overview'?'active':''}>Overview</button>
+          <button onClick={()=>setActiveSection('toolkit')} className={activeSection==='toolkit'?'active':''}>Advisor Toolkit</button>
+          <button onClick={()=>setActiveSection('assets')} className={activeSection==='assets'?'active':''}>Calculators</button>
+        </div>
+      </nav>
+      <main className="main-content">{renderContent()}</main>
+    </div>
+  );
+}
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
